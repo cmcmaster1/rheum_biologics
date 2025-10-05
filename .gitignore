@@ -108,3 +108,7 @@ Thumbs.db
 
 # Local development
 *.local
+
+
+# Logs
+logs/

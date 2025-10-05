@@ -1,0 +1,19 @@
+# Railway ignore file - this is a monorepo
+# Deploy individual services by setting Root Directory in Railway dashboard
+
+# Ignore root-level files that shouldn't be deployed
+package.json
+package-lock.json
+node_modules/
+.git/
+.gitignore
+README.md
+DEPLOYMENT.md
+deploy.sh
+docker-compose.yml
+logs/
+*.log
+
+# Keep only the service directories
+!backend/
+!frontend/

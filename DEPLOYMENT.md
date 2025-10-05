@@ -107,18 +107,27 @@ After both services are deployed, run the initial data ingestion:
 railway run --service backend npm run ingest:run
 ```
 
-## Alternative: Deploy via Railway Dashboard
+## Alternative: Deploy via Railway Dashboard (Recommended)
 
-If you prefer using the web interface:
+**IMPORTANT**: This is a monorepo with separate backend and frontend services. You need to deploy them as separate services.
 
 1. Go to https://railway.app
 2. Click "New Project"
 3. Select "Deploy from GitHub repo"
 4. Choose your `rheum_biologics` repository
-5. Railway will automatically detect the configuration files
-6. Add the PostgreSQL service
-7. Configure environment variables as listed above
-8. Deploy both services
+5. **Add PostgreSQL Database**:
+   - Click "+ New" → "Database" → "PostgreSQL"
+6. **Deploy Backend Service**:
+   - Click "+ New" → "Service" → "Deploy from GitHub repo"
+   - Select your `rheum_biologics` repository
+   - **Set Root Directory to `backend`**
+   - Railway will use `backend/nixpacks.toml`
+7. **Deploy Frontend Service**:
+   - Click "+ New" → "Service" → "Deploy from GitHub repo"
+   - Select your `rheum_biologics` repository
+   - **Set Root Directory to `frontend`**
+   - Railway will use `frontend/nixpacks.toml`
+8. Configure environment variables as listed above
 
 ## Monitoring and Logs
 
