@@ -1,8 +1,12 @@
+# Railway configuration for backend service only
+# This file configures Railway to deploy the backend service using Docker
+
 [build]
-builder = "nixpacks"
-buildCommand = "npm run build"
+builder = "dockerfile"
+dockerfilePath = "backend/Dockerfile"
 
 [deploy]
 startCommand = "npm start"
-healthcheckPath = "/api/health"
-healthcheckTimeout = 300
+
+[variables]
+NIXPACKS_NO_DEFAULT_CACHE_DIRS = "true"
