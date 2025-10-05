@@ -1,0 +1,39 @@
+{
+  "name": "rheum-biologics",
+  "version": "0.1.0",
+  "description": "A modern web application for rheumatologists to explore PBS biologics data",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "deploy": "./deploy.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cmcmaster1/rheum_biologics.git"
+  },
+  "keywords": [
+    "rheumatology",
+    "biologics",
+    "pbs",
+    "healthcare",
+    "typescript",
+    "react",
+    "express"
+  ],
+  "author": "Christopher McMaster",
+  "license": "MIT"
+}
