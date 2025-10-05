@@ -36,11 +36,17 @@ This will create a PostgreSQL database service in your Railway project.
 
 ### 4. Deploy the Backend
 
+**Option A: Deploy Backend Service**
+1. In Railway dashboard, create a new service
+2. Select "Deploy from GitHub repo"
+3. Choose your repository
+4. Set **Root Directory** to `backend`
+5. Railway will use the `backend/nixpacks.toml` configuration
+
+**Option B: Use CLI (if working)**
 ```bash
 railway up
 ```
-
-This will deploy the backend service using the configuration in `railway.json` and `nixpacks.toml`.
 
 ### 5. Configure Environment Variables
 
@@ -79,15 +85,11 @@ railway run psql $DATABASE_URL -f backend/db/migrations/002_alter_column_lengths
 
 Create a new service for the frontend:
 
-```bash
-railway service
-```
-
-Select "New Service" and choose "Deploy from GitHub repo". Select your repository and configure:
-
-- **Build Command**: `cd frontend && npm run build`
-- **Start Command**: `cd frontend && npx serve -s dist -l 3000`
-- **Root Directory**: `frontend`
+1. In Railway dashboard, click **"+ New"** → **"Service"**
+2. Select **"Deploy from GitHub repo"**
+3. Choose your repository
+4. Set **Root Directory** to `frontend`
+5. Railway will automatically use the `frontend/nixpacks.toml` configuration
 
 ### 8. Configure Frontend Environment Variables
 

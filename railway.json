@@ -4,7 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "cd backend && npm start",
     "healthcheckPath": "/api/schedules",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
