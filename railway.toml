@@ -2,11 +2,11 @@
 # This file configures Railway to deploy the backend service from the backend directory
 
 [build]
-builder = "nixpacks"
-buildCommand = "cd backend && npm ci && npm run build"
+builder = "dockerfile"
+dockerfilePath = "backend/Dockerfile"
 
 [deploy]
-startCommand = "cd backend && npm start"
+startCommand = "npm start"
 
 [variables]
 NIXPACKS_NO_DEFAULT_CACHE_DIRS = "true"
