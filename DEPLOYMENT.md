@@ -57,7 +57,7 @@ BIOLOGICS_INGEST_ENABLED=true
 BIOLOGICS_INGEST_CRON=0 4 1 * *
 BIOLOGICS_INGEST_TZ=Australia/Sydney
 BIOLOGICS_INGEST_LOOKBACK=3
-HF_TOKEN=your_huggingface_token_here
+# Note: No external API tokens required - data is sourced directly from PBS website
 ```
 
 #### Optional Environment Variables:
@@ -140,7 +140,7 @@ To add custom domains:
 1. **Database Connection Issues**: Ensure `DATABASE_URL` is set correctly
 2. **CORS Issues**: Check `CORS_ORIGIN` matches your frontend URL
 3. **Build Failures**: Check logs for missing dependencies or build errors
-4. **Ingestion Failures**: Verify `HF_TOKEN` is valid and has access to the dataset
+4. **Ingestion Failures**: Check that PBS website is accessible and CSV files are available
 
 ### Useful Commands:
 

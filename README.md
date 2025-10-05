@@ -1,6 +1,6 @@
 # Rheumatology Biologics Lookup
 
-A modern, server-hosted web application for rheumatologists to explore Pharmaceutical Benefits Scheme (PBS) biologics data. The system replaces the legacy Gradio prototype with a modular architecture consisting of a TypeScript/Express API, PostgreSQL storage, a React + MUI frontend, and an in-process Node.js ingestion job that pulls PBS CSV exports directly into the biologics database.
+A modern, server-hosted web application for rheumatologists to explore Pharmaceutical Benefits Scheme (PBS) biologics data. The system replaces the legacy Gradio prototype with a modular architecture consisting of a TypeScript/Express API, PostgreSQL storage, a React + MUI frontend, and an in-process Node.js ingestion job that pulls PBS CSV exports directly from the official PBS website into the biologics database.
 
 ## Project Structure
 
