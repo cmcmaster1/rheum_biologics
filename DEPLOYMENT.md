@@ -43,9 +43,16 @@ This will create a PostgreSQL database service in your Railway project.
 4. Set **Root Directory** to `backend`
 5. Railway will use the `backend/nixpacks.toml` configuration
 
-**Option B: Use CLI (if working)**
+**Option B: Use CLI (monorepo-safe)**
+Deploy each service from its own directory to avoid mixing frontend/backend code:
 ```bash
-railway up
+# Backend
+cd backend
+railway up --service backend
+
+# Frontend (in a separate shell or after backend)
+cd ../frontend
+railway up --service frontend
 ```
 
 ### 5. Configure Environment Variables
@@ -72,6 +79,22 @@ BIOLOGICS_INGEST_LOOKBACK=3
 CORS_ORIGIN=*  # For development, restrict in production
 ```
 
+#### Feedback Email (optional)
+
+To enable the in-app feedback form to email the admin inbox (`admin@rheumai.com`), configure SMTP on the backend service:
+
+```
+SMTP_HOST=<smtp host>
+SMTP_PORT=<smtp port, e.g. 587>
+SMTP_USER=<smtp user, if required>
+SMTP_PASS=<smtp password, if required>
+MAIL_FROM=no-reply@rheumai.com
+# Optional override (defaults to admin@rheumai.com):
+MAIL_TO=admin@rheumai.com
+```
+
+If SMTP variables are not set, feedback submissions are logged to server output and not emailed.
+
 ### 6. Run Database Migrations
 
 After the backend is deployed, run the database migrations:
@@ -89,7 +112,7 @@ Create a new service for the frontend:
 2. Select **"Deploy from GitHub repo"**
 3. Choose your repository
 4. Set **Root Directory** to `frontend`
-5. Railway will automatically use the `frontend/nixpacks.toml` configuration
+5. Railway will use the `frontend/railway.toml` (Docker) or `frontend/nixpacks.toml` if you switch builders
 
 ### 8. Configure Frontend Environment Variables
 
@@ -109,7 +132,7 @@ railway run --service backend npm run ingest:run
 
 ## Alternative: Deploy via Railway Dashboard (Recommended)
 
-**IMPORTANT**: This is a monorepo with separate backend and frontend services. You need to deploy them as separate services.
+**IMPORTANT**: This is a monorepo with separate backend and frontend services. Deploy them as separate services, from their respective folders when using the CLI.
 
 1. Go to https://railway.app
 2. Click "New Project"
@@ -121,12 +144,12 @@ railway run --service backend npm run ingest:run
    - Click "+ New" → "Service" → "Deploy from GitHub repo"
    - Select your `rheum_biologics` repository
    - **Set Root Directory to `backend`**
-   - Railway will use `backend/nixpacks.toml`
+   - Railway will use `backend/railway.toml` (Docker) or `backend/nixpacks.toml` if you switch builders
 7. **Deploy Frontend Service**:
    - Click "+ New" → "Service" → "Deploy from GitHub repo"
    - Select your `rheum_biologics` repository
    - **Set Root Directory to `frontend`**
-   - Railway will use `frontend/nixpacks.toml`
+   - Railway will use `frontend/railway.toml` (Docker) or `frontend/nixpacks.toml` if you switch builders
 8. Configure environment variables as listed above
 
 ## Monitoring and Logs
@@ -165,8 +188,16 @@ railway variables
 # Connect to database
 railway connect postgresql
 
-# Run commands in service
+# Run commands in a specific service
 railway run --service backend npm run ingest:run
+railway logs --service backend
+railway logs --service frontend
+
+### Monorepo tips (CLI)
+
+- Always run `railway up` from the service folder (`backend/` or `frontend/`).
+- The root `.railwayignore` is generic; each service has its own `.railwayignore` to scope uploads.
+- The Dockerfiles are now relative to their own folders, and `railway.toml` points to `Dockerfile` in each folder.
 ```
 
 ## Production Considerations

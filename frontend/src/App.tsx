@@ -1,30 +1,53 @@
-import { Box, Container, Link, Stack, Typography } from '@mui/material';
+import { Box, Button, Container, Stack, Typography } from '@mui/material';
 
 import { FiltersPanel } from './components/filters/FiltersPanel';
 import { SearchResults } from './features/combinations/components/SearchResults';
+import { useState } from 'react';
+import { FeedbackDialog } from './components/FeedbackDialog';
 
 const App = () => {
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: 'grey.100' }}>
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Stack spacing={4}>
           <Stack spacing={1}>
-            <Typography variant="h4" fontWeight={700}>
-              PBS Biologics Lookup
-            </Typography>
-            <Typography color="text.secondary">
-              Evidence-based biologic prescribing support for rheumatologists. Data sourced from the
-              Australian Pharmaceutical Benefits Scheme (PBS).
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Latest releases available monthly. For feedback contact{' '}
-              <Link href="mailto:pbs-support@example.com">pbs-support@example.com</Link>.
-            </Typography>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={2}
+              alignItems={{ xs: 'stretch', sm: 'center' }}
+              justifyContent="space-between"
+            >
+              <Typography variant="h4" fontWeight={700}>
+                PBS Biologics Lookup
+              </Typography>
+              <Box 
+                sx={{ 
+                  backgroundColor: 'primary.light', 
+                  color: 'primary.contrastText',
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  fontSize: '0.875rem',
+                  textAlign: 'center',
+                  width: { xs: '100%', sm: 'auto' },
+                  minWidth: { xs: 'auto', sm: '300px' }
+                }}
+              >
+                We're looking for a sponsor. Email admin@rheumai.com to advertise in this space
+              </Box>
+            </Stack>
+            <Box>
+              <Button variant="outlined" size="small" onClick={() => setFeedbackOpen(true)}>
+                Send Feedback
+              </Button>
+            </Box>
           </Stack>
 
           <FiltersPanel />
 
           <SearchResults />
+          <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
         </Stack>
       </Container>
     </Box>

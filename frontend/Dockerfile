@@ -4,13 +4,13 @@ FROM node:18-alpine as build
 WORKDIR /app
 
 # Copy package files
-COPY frontend/package*.json ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy source code
-COPY frontend/ ./
+COPY . .
 
 # Build the application
 RUN npm run build
@@ -22,14 +22,14 @@ FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy nginx configuration
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy startup script
-COPY frontend/start.sh /start.sh
+COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
-# Expose port (Railway will set PORT env var)
-EXPOSE $PORT
+# Expose default nginx port (Railway sets PORT env var)
+EXPOSE 80
 
 # Start nginx with environment variable substitution
 CMD ["/start.sh"]

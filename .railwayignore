@@ -1,4 +1,4 @@
-# Railway ignore file for monorepo
+# Generic Railway ignore for repo root
 
 # VCS and local metadata
 .git/
@@ -15,21 +15,7 @@ build/
 logs/
 *.log
 
-# Ignore frontend completely for backend deployment
-frontend/
-frontend/**
-!frontend
-
-# For backend service deployment, only include backend files
-!backend/package.json
-!backend/package-lock.json
-!backend/tsconfig.json
-!backend/src/
-!backend/dist/
-!backend/railway.toml
-!backend/nixpacks.toml
-!backend/Dockerfile
-
-# Ignore root package.json to prevent workspace detection
-package.json
-package-lock.json
+# Editor/OS files
+.DS_Store
+.env
+**/.env

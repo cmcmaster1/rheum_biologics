@@ -47,7 +47,12 @@ const ResultCard = ({
   <Card variant="outlined" sx={{ height: '100%' }}>
     <CardContent>
       <Stack spacing={1.2}>
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          alignItems={{ xs: 'stretch', sm: 'flex-start' }}
+          spacing={{ xs: 1, sm: 0 }}
+        >
           <Box>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Typography variant="h6">{drug}</Typography>
@@ -69,7 +74,7 @@ const ResultCard = ({
             </Stack>
             <Typography color="text.secondary">{brand}</Typography>
           </Box>
-          <Typography variant="body2" fontWeight={600}>
+          <Typography variant="body2" fontWeight={600} sx={{ mt: { xs: 1, sm: 0 } }}>
             <Link
               href={`https://www.pbs.gov.au/medicine/item/${pbsCode}`}
               target="_blank"

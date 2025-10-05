@@ -3,12 +3,14 @@ import { Router } from 'express';
 import { combinationsRouter } from './combinations.js';
 import { lookupsRouter } from './lookups.js';
 import { schedulesRouter } from './schedules.js';
+import { feedbackRouter } from './feedback.js';
 import { runBiologicsIngestion } from '../jobs/biologicsIngestion.js';
 
 const router = Router();
 
 router.use('/combinations', combinationsRouter);
 router.use('/schedules', schedulesRouter);
+router.use('/feedback', feedbackRouter);
 router.use('/', lookupsRouter);
 
 // Manual ingestion endpoint

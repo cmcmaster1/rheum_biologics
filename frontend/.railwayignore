@@ -1,0 +1,21 @@
+# Limit upload context to frontend only
+../*
+
+!package.json
+!package-lock.json
+!tsconfig.json
+!tsconfig.node.json
+!vite.config.ts
+!index.html
+!src/
+!dist/
+!nixpacks.toml
+!railway.toml
+!Dockerfile
+!nginx.conf
+!start.sh
+
+# Common ignores
+node_modules/
+dist/
+*.log

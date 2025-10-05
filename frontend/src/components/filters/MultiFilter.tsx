@@ -13,6 +13,7 @@ export const MultiFilter = ({ label, placeholder, options, value, onChange, load
   return (
     <Autocomplete
       multiple
+      fullWidth
       options={options}
       value={value}
       onChange={(_event, newValue) => onChange(newValue)}
@@ -28,7 +29,7 @@ export const MultiFilter = ({ label, placeholder, options, value, onChange, load
               title={option} // Show full text on hover
               {...getTagProps({ index })} 
               key={option}
-              sx={{ maxWidth: '200px' }} // Limit chip width
+              sx={{ maxWidth: { xs: 160, sm: 200 } }} // Limit chip width for mobile
             />
           );
         })

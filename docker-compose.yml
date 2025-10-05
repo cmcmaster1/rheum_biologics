@@ -31,6 +31,13 @@ services:
       BIOLOGICS_INGEST_CRON: "0 4 1 * *"
       BIOLOGICS_INGEST_TZ: "Australia/Sydney"
       BIOLOGICS_INGEST_LOOKBACK: "3"
+      # Email feedback (SMTP). Non-secrets can default here; SMTP_PASS is required from shell env
+      SMTP_HOST: ${SMTP_HOST:-mail.privateemail.com}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-admin@rheumai.com}
+      MAIL_FROM: ${MAIL_FROM:-admin@rheumai.com}
+      MAIL_TO: ${MAIL_TO:-admin@rheumai.com}
+      SMTP_PASS: ${SMTP_PASS:?Set SMTP_PASS in your shell before running compose}
     depends_on:
       postgres:
         condition: service_healthy
