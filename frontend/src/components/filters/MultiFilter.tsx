@@ -18,9 +18,20 @@ export const MultiFilter = ({ label, placeholder, options, value, onChange, load
       onChange={(_event, newValue) => onChange(newValue)}
       filterSelectedOptions
       renderTags={(tagValue, getTagProps) =>
-        tagValue.map((option, index) => (
-          <Chip size="small" variant="outlined" label={option} {...getTagProps({ index })} key={option} />
-        ))
+        tagValue.map((option, index) => {
+          const truncatedLabel = option.length > 50 ? `${option.substring(0, 47)}...` : option;
+          return (
+            <Chip 
+              size="small" 
+              variant="outlined" 
+              label={truncatedLabel}
+              title={option} // Show full text on hover
+              {...getTagProps({ index })} 
+              key={option}
+              sx={{ maxWidth: '200px' }} // Limit chip width
+            />
+          );
+        })
       }
       renderInput={(params) => (
         <TextField

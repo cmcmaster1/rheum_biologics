@@ -65,13 +65,13 @@ export const FiltersPanel = () => {
     <Paper elevation={0} variant="outlined" sx={{ p: 2.5 }}>
       <Stack spacing={2.5}>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-          <Stack flex={1} spacing={1}>
+          <Stack flex={1} spacing={1} sx={{ minWidth: 0 }}>
             <Typography variant="subtitle2" color="text.secondary">
               Schedule
             </Typography>
             <ScheduleSelect />
           </Stack>
-          <Stack flex={1} spacing={1}>
+          <Stack flex={1} spacing={1} sx={{ minWidth: 0 }}>
             <Typography variant="subtitle2" color="text.secondary">
               Drug
             </Typography>
@@ -84,7 +84,7 @@ export const FiltersPanel = () => {
               loading={drugsQuery.isLoading}
             />
           </Stack>
-          <Stack flex={1} spacing={1}>
+          <Stack flex={1} spacing={1} sx={{ minWidth: 0 }}>
             <Typography variant="subtitle2" color="text.secondary">
               Brand
             </Typography>
@@ -100,7 +100,7 @@ export const FiltersPanel = () => {
         </Stack>
 
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-          <Stack flex={1} spacing={1}>
+          <Stack flex={1} spacing={1} sx={{ minWidth: 0 }}> {/* minWidth: 0 allows flex items to shrink */}
             <Typography variant="subtitle2" color="text.secondary">
               Indication
             </Typography>
@@ -113,7 +113,7 @@ export const FiltersPanel = () => {
               loading={indicationsQuery.isLoading}
             />
           </Stack>
-          <Stack flex={1} spacing={1}>
+          <Stack flex={1} spacing={1} sx={{ minWidth: 0 }}>
             <Typography variant="subtitle2" color="text.secondary">
               Formulation
             </Typography>
@@ -126,7 +126,7 @@ export const FiltersPanel = () => {
               loading={formulationsQuery.isLoading}
             />
           </Stack>
-          <Stack flex={1} spacing={1}>
+          <Stack flex={1} spacing={1} sx={{ minWidth: 0 }}>
             <Typography variant="subtitle2" color="text.secondary">
               Treatment phase
             </Typography>

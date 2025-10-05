@@ -1,8 +1,8 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Alert, Box, Card, CardContent, CircularProgress, Grid, Link, Pagination, Stack, Typography } from '@mui/material';
 import { useSearchStore } from '../../../store/searchStore';
-import { useCombinationSearch } from '../hooks/useCombinationSearch';
 import { getARALink, hasARALink } from '../../../utils/araLinks';
+import { useCombinationSearch } from '../hooks/useCombinationSearch';
 const ResultCard = ({ drug, brand, pbsCode, formulation, indication, treatmentPhase, hospitalType, authorityMethod, streamlinedCode, onlineApplication, maximumQuantity, maximumPack, repeats }) => (_jsx(Card, { variant: "outlined", sx: { height: '100%' }, children: _jsx(CardContent, { children: _jsxs(Stack, { spacing: 1.2, children: [_jsxs(Stack, { direction: "row", justifyContent: "space-between", alignItems: "flex-start", children: [_jsxs(Box, { children: [_jsxs(Stack, { direction: "row", alignItems: "center", spacing: 1, children: [_jsx(Typography, { variant: "h6", children: drug }), hasARALink(drug) && (_jsx(Link, { href: getARALink(drug), target: "_blank", rel: "noopener noreferrer", underline: "hover", sx: {
                                                 fontSize: '0.875rem',
                                                 color: 'primary.main',

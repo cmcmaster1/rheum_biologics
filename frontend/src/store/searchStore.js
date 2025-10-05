@@ -20,7 +20,8 @@ export const useSearchStore = create((set) => ({
         if (key === 'scheduleMonth') {
             return { ...state, scheduleMonth: value, page: 1 };
         }
-        return { ...state, [key]: value, page: 1 };
+        const nextValues = Array.isArray(value) ? value : [];
+        return { ...state, [key]: nextValues, page: 1 };
     }),
     resetFilters: () => set(() => ({ ...defaultState })),
     setPage: (page) => set((state) => ({ ...state, page }))
