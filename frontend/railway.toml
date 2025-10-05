@@ -1,5 +1,6 @@
 [build]
-builder = "nixpacks"
+builder = "dockerfile"
+dockerfilePath = "frontend/Dockerfile"
 
 [deploy]
-startCommand = "npx serve -s dist -l $PORT"
+startCommand = "/start.sh"
