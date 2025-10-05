@@ -1,15 +1,8 @@
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { createElement as _createElement } from "react";
 import { Autocomplete, Chip, CircularProgress, TextField } from '@mui/material';
-export const MultiFilter = ({ label, placeholder, options, value, onChange, loading, validateSelection }) => {
-    const handleChange = async (_event, newValue) => {
-        if (validateSelection) {
-            const isValid = await validateSelection(newValue);
-            if (!isValid) {
-                // Don't update if validation fails
-                return;
-            }
-        }
+export const MultiFilter = ({ label, placeholder, options, value, onChange, loading }) => {
+    const handleChange = (_event, newValue) => {
         onChange(newValue);
     };
     return (_jsx(Autocomplete, { multiple: true, options: options, value: value, onChange: handleChange, filterSelectedOptions: true, renderTags: (tagValue, getTagProps) => tagValue.map((option, index) => {
