@@ -5,14 +5,14 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy only backend package files
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy only backend source code
-COPY src/ ./src/
-COPY tsconfig.json ./
+COPY backend/src/ ./src/
+COPY backend/tsconfig.json ./
 
 # Build the backend application
 RUN npm run build
@@ -22,7 +22,7 @@ EXPOSE 3001
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/api/schedules', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+  CMD node -e "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Start the application
 CMD ["npm", "start"]
