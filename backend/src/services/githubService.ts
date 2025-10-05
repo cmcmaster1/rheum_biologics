@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const GITHUB_OWNER = process.env.GITHUB_OWNER || 'cmcmaster';
+const GITHUB_OWNER = process.env.GITHUB_OWNER || 'cmcmaster1';
 const GITHUB_REPO = process.env.GITHUB_REPO || 'rheum_biologics';
 
 let octokit: Octokit | null = null;

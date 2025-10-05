@@ -20,7 +20,7 @@ BACKEND_SERVICE=${BACKEND_SERVICE:-backend}
 FRONTEND_SERVICE=${FRONTEND_SERVICE:-frontend}
 
 # GitHub configuration (hardcoded)
-GITHUB_OWNER="cmcmaster"
+GITHUB_OWNER="cmcmaster1"
 GITHUB_REPO="rheum_biologics"
 
 echo "Configuring backend GitHub variables on Railway ($BACKEND_SERVICE)"
