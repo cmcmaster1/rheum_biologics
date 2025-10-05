@@ -15,6 +15,11 @@ build/
 logs/
 *.log
 
+# Ignore frontend completely for backend deployment
+frontend/
+frontend/**
+!frontend
+
 # For backend service deployment, only include backend files
 !backend/package.json
 !backend/package-lock.json
@@ -25,5 +30,6 @@ logs/
 !backend/nixpacks.toml
 !backend/Dockerfile
 
-# Ignore frontend completely for backend deployment
-frontend/
+# Ignore root package.json to prevent workspace detection
+package.json
+package-lock.json

@@ -3,7 +3,10 @@
 
 [build]
 builder = "nixpacks"
-buildCommand = "cd backend && npm run build"
+buildCommand = "cd backend && npm ci && npm run build"
 
 [deploy]
 startCommand = "cd backend && npm start"
+
+[variables]
+NIXPACKS_NO_DEFAULT_CACHE_DIRS = "true"
