@@ -33,6 +33,13 @@ npm install
 npm run dev
 ```
 
+**Environment Variables:**
+- `DATABASE_URL` – PostgreSQL connection string
+- `PORT` – API server port (default: 3001)
+- `GITHUB_TOKEN` – Personal access token for creating feedback issues
+- `GITHUB_OWNER` – GitHub username/organization (default: cmcmaster)
+- `GITHUB_REPO` – Repository name (default: rheum_biologics)
+
 The backend automatically schedules a monthly ingestion (default: 04:00 on the 1st, Australia/Sydney). Configuration is controlled via:
 
 - `BIOLOGICS_INGEST_ENABLED` – toggle the scheduler
@@ -57,6 +64,7 @@ Key API endpoints (prefixed with `/api`):
 - `GET /api/formulations`
 - `GET /api/treatment-phases`
 - `GET /api/hospital-types`
+- `POST /api/feedback` – Creates GitHub issues for user feedback
 
 ### 3. Frontend
 

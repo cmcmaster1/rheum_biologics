@@ -108,8 +108,26 @@ fi
 
 echo "✅ Backend deployment initiated"
 
+# Set GitHub variables for feedback system
+echo "🔧 Setting GitHub variables for feedback system..."
+GITHUB_OWNER="cmcmaster"
+GITHUB_REPO="rheum_biologics"
+
+if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+  read -s -p "GitHub Personal Access Token (for feedback issues): " GITHUB_TOKEN_INPUT; echo
+else
+  GITHUB_TOKEN_INPUT=$GITHUB_TOKEN
+fi
+
+railway variables --service "$BACKEND_SERVICE" \
+  --set "GITHUB_OWNER=$GITHUB_OWNER" \
+  --set "GITHUB_REPO=$GITHUB_REPO" \
+  --set "GITHUB_TOKEN=$GITHUB_TOKEN_INPUT" >/dev/null
+
+unset GITHUB_TOKEN_INPUT
+
 # Optionally set some common backend variables (safe defaults)
-echo "🔧 You may want to set backend variables (PORT, CORS_ORIGIN, BIOLOGICS_*) via dashboard or CLI. Examples:"
+echo "🔧 You may want to set additional backend variables (PORT, CORS_ORIGIN, BIOLOGICS_*) via dashboard or CLI. Examples:"
 echo "   railway variables --service $BACKEND_SERVICE --set 'PORT=3001'"
 echo "   railway variables --service $BACKEND_SERVICE --set 'NODE_ENV=production'"
 echo "   railway variables --service $BACKEND_SERVICE --set 'CORS_ORIGIN=https://rheum-biologics.up.railway.app'"

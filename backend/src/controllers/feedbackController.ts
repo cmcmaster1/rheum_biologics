@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { sendFeedbackEmail } from '../services/emailService.js';
+import { createFeedbackIssue } from '../services/githubService.js';
 
 const feedbackSchema = z.object({
   type: z.enum(['bug', 'feature', 'new_medication', 'new_indication']),
@@ -22,10 +22,10 @@ export async function postFeedback(req: Request, res: Response) {
     referer: req.get('referer') || undefined
   };
 
-  // Do not block the response on SMTP. Queue and return 202 immediately.
+  // Do not block the response on GitHub API. Queue and return 202 immediately.
   setImmediate(() => {
-    sendFeedbackEmail({ type, message, contact, meta }).catch((err) => {
-      console.error('[Feedback] Failed to send email:', err);
+    createFeedbackIssue({ type, message, contact, meta }).catch((err) => {
+      console.error('[Feedback] Failed to create GitHub issue:', err);
     });
   });
 
