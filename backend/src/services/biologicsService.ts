@@ -34,10 +34,23 @@ const SORT_COLUMNS: Record<string, string> = {
 const normalizeArray = (value?: string | string[]): string[] | undefined => {
   if (!value) return undefined;
   if (Array.isArray(value)) return value.filter(Boolean);
-  return value
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
+  
+  // For single string values, treat them as single values unless they clearly look like
+  // comma-separated lists (multiple short values)
+  const trimmedValue = value.trim();
+  
+  // Only split if it looks like a clear multi-value list
+  // Check if it has multiple short segments separated by commas
+  const parts = trimmedValue.split(',').map(p => p.trim());
+  const hasMultipleShortParts = parts.length > 1 && parts.every(part => part.length < 30 && part.length > 0);
+  
+  if (hasMultipleShortParts) {
+    // This looks like a comma-separated list of short values
+    return parts.filter(Boolean);
+  } else {
+    // This looks like a single value (even if it contains commas)
+    return [trimmedValue];
+  }
 };
 
 const appendFilter = (
@@ -116,6 +129,7 @@ export const searchCombinations = async (
     sort: Array.isArray(filterParams.sort) ? filterParams.sort[0] : filterParams.sort
   };
 
+
   const whereClauses: string[] = [];
   const values: unknown[] = [];
 
@@ -138,6 +152,7 @@ export const searchCombinations = async (
   appendFilter(whereClauses, values, 'authority_method', filters.authority_method);
 
   const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
 
   const sortKey = filters.sort && SORT_COLUMNS[filters.sort] ? filters.sort : 'default';
   const orderBy = `ORDER BY ${SORT_COLUMNS[sortKey]}`;
@@ -312,9 +327,12 @@ export const getLookupValues = async (
   }
 
   const maybeAppend = (field: keyof CombinationFilters, filterValues?: string[]) => {
-    if (column === field || column === field.replace('_', '')) {
+    // Don't filter by the column we're looking up
+    if (column === field) {
+      console.log(`SKIPPING filter for ${field} because we're looking up ${column}`);
       return;
     }
+    console.log(`ADDING filter for ${field}:`, filterValues);
     appendFilter(whereClauses, values, field, filterValues);
   };
 
