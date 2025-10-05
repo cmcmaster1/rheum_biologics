@@ -5,7 +5,12 @@ type RawValue = string | string[] | undefined;
 
 type RawQuery = Record<string, RawValue> | ParsedQs;
 
-const coerceNumber = (value: RawValue, fallback: number) => {
+const coerceNumber = (value: any, fallback: number) => {
+  // Handle nested ParsedQs objects
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return fallback;
+  }
+
   if (Array.isArray(value)) {
     return Number.parseInt(value[0] ?? `${fallback}`, 10);
   }

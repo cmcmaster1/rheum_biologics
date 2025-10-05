@@ -5,6 +5,6 @@ import { parsePagination } from '../utils/pagination.js';
 
 export const getCombinations = async (req: Request, res: Response) => {
   const { limit, offset } = parsePagination(req.query);
-  const result = await searchCombinations(req.query, limit, offset);
+  const result = await searchCombinations(req.query as any, limit, offset);
   res.json(result);
 };

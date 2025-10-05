@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { getLookupValues } from '../services/biologicsService.js';
 
 const createLookupHandler = (column: string) => async (req: Request, res: Response) => {
-  const values = await getLookupValues(column, req.query);
+  const values = await getLookupValues(column, req.query as any);
   res.json({ data: values });
 };
 
