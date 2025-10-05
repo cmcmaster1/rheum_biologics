@@ -2,10 +2,14 @@
 nixPkgs = ["nodejs"]
 
 [phases.install]
-cmds = ["npm install"]
+cmds = ["npm ci"]
 
 [phases.build]
 cmds = ["npm run build"]
 
 [start]
 cmd = "npm start"
+
+[variables]
+NIXPACKS_NO_DEFAULT_CACHE_DIRS = "true"
+NIXPACKS_NODE_VERSION = "18"

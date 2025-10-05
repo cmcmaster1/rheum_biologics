@@ -15,6 +15,15 @@ build/
 logs/
 *.log
 
-# Allow service directories content to be uploaded when deploying from repo root
-!backend/**
-!frontend/**
+# For backend service deployment, only include backend files
+!backend/package.json
+!backend/package-lock.json
+!backend/tsconfig.json
+!backend/src/
+!backend/dist/
+!backend/railway.toml
+!backend/nixpacks.toml
+!backend/Dockerfile
+
+# Ignore frontend completely for backend deployment
+frontend/
