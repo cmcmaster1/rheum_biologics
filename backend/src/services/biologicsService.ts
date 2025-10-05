@@ -336,7 +336,7 @@ export const getLookupValues = async (
   `;
 
   const result = await query(sql, values);
-  return result.rows.map((row) => row[column]).filter(Boolean);
+  return result.rows.map((row: any) => row[column]).filter(Boolean);
 };
 
 export type Schedule = {

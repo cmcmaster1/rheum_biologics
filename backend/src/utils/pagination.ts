@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import { ParsedQs } from 'qs';
 
 type RawValue = string | string[] | undefined;
 
-type RawQuery = Record<string, RawValue>;
+type RawQuery = Record<string, RawValue> | ParsedQs;
 
 const coerceNumber = (value: RawValue, fallback: number) => {
   if (Array.isArray(value)) {

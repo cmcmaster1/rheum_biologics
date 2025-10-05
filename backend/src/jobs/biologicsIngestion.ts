@@ -175,7 +175,7 @@ const parseCsv = (content: string): CsvRow[] => {
     console.warn('Encountered CSV parse errors:', result.errors.slice(0, 3));
   }
 
-  return result.data.filter((row) =>
+  return result.data.filter((row: any) =>
     Object.values(row).some((value) => {
       if (value === undefined || value === null) return false;
       return String(value).trim() !== '' && String(value).trim().toLowerCase() !== 'null';
@@ -188,7 +188,7 @@ const extractTables = async (zipBuffer: Buffer): Promise<RequiredTables> => {
   const tables: Partial<RequiredTables> = {};
 
   for (const [key, expectedPath] of Object.entries(REQUIRED_FILES)) {
-    const entry = archive.files.find((file) => file.path.toLowerCase().endsWith(expectedPath));
+    const entry = archive.files.find((file: any) => file.path.toLowerCase().endsWith(expectedPath));
     if (!entry) {
       throw new Error(`PBS archive missing required file: ${expectedPath}`);
     }
