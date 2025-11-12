@@ -12,6 +12,7 @@ export const useCombinationSearch = () => {
         indication: state.indication,
         treatmentPhase: state.treatmentPhase,
         hospitalType: state.hospitalType,
+        pbsCode: state.pbsCode,
         limit: state.limit,
         page: state.page
     }));
@@ -26,6 +27,7 @@ export const useCombinationSearch = () => {
             indication: [...filters.indication],
             treatment_phase: [...filters.treatmentPhase],
             hospital_type: [...filters.hospitalType],
+            pbs_code: [...filters.pbsCode],
             limit: filters.limit,
             offset
         };

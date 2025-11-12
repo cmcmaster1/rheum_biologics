@@ -44,18 +44,30 @@ const ResultCard = ({
   maximumPack: number | null;
   repeats: number | null;
 }) => (
-  <Card variant="outlined" sx={{ height: '100%' }}>
-    <CardContent>
-      <Stack spacing={1.2}>
+  <Card variant="outlined" sx={{ 
+    height: '100%',
+    width: '100%',
+    maxWidth: '100%',
+    overflow: 'hidden'
+  }}>
+    <CardContent sx={{ 
+      padding: { xs: 1.5, sm: 2 },
+      '&:last-child': { 
+        paddingBottom: { xs: 1.5, sm: 2 } 
+      },
+      overflow: 'hidden',
+      wordWrap: 'break-word'
+    }}>
+      <Stack spacing={{ xs: 0.8, sm: 1.2 }}>
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           justifyContent="space-between"
           alignItems={{ xs: 'stretch', sm: 'flex-start' }}
-          spacing={{ xs: 1, sm: 0 }}
+          spacing={{ xs: 0.5, sm: 0 }}
         >
           <Box>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography variant="h6">{drug}</Typography>
+              <Typography variant="h6" sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>{drug}</Typography>
               {hasARALink(drug) && (
                 <Link
                   href={getARALink(drug)!}
@@ -63,7 +75,7 @@ const ResultCard = ({
                   rel="noopener noreferrer"
                   underline="hover"
                   sx={{ 
-                    fontSize: '0.875rem',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     color: 'primary.main',
                     fontWeight: 500
                   }}
@@ -72,9 +84,12 @@ const ResultCard = ({
                 </Link>
               )}
             </Stack>
-            <Typography color="text.secondary">{brand}</Typography>
+            <Typography color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>{brand}</Typography>
           </Box>
-          <Typography variant="body2" fontWeight={600} sx={{ mt: { xs: 1, sm: 0 } }}>
+          <Typography variant="body2" fontWeight={600} sx={{ 
+            mt: { xs: 1, sm: 0 },
+            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+          }}>
             <Link
               href={`https://www.pbs.gov.au/medicine/item/${pbsCode}`}
               target="_blank"
@@ -85,28 +100,28 @@ const ResultCard = ({
             </Link>
           </Typography>
         </Stack>
-        <Typography variant="subtitle2" color="text.secondary">
+        <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
           {formulation}
         </Typography>
-        <Typography variant="body2">Indication: {indication}</Typography>
+        <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Indication: {indication}</Typography>
         {treatmentPhase && (
-          <Typography variant="body2">Treatment phase: {treatmentPhase}</Typography>
+          <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Treatment phase: {treatmentPhase}</Typography>
         )}
-        {hospitalType && <Typography variant="body2">Hospital type: {hospitalType}</Typography>}
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+        {hospitalType && <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Hospital type: {hospitalType}</Typography>}
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 0.5, sm: 1 }}>
           {authorityMethod && (
-            <Typography variant="body2">Authority: {authorityMethod}</Typography>
+            <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Authority: {authorityMethod}</Typography>
           )}
           {streamlinedCode && (
-            <Typography variant="body2">Streamlined: {streamlinedCode}</Typography>
+            <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Streamlined: {streamlinedCode}</Typography>
           )}
         </Stack>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 0.5, sm: 1 }}>
           {maximumPackageText(maximumPack, maximumQuantity)}
-          {repeats !== null && <Typography variant="body2">Repeats: {repeats}</Typography>}
+          {repeats !== null && <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Repeats: {repeats}</Typography>}
         </Stack>
         {onlineApplication !== null && (
-          <Typography variant="body2">
+          <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
             Online application: {onlineApplication ? 'Available' : 'Contact Services Australia'}
           </Typography>
         )}
@@ -128,7 +143,7 @@ const maximumPackageText = (pack: number | null, units: number | null) => {
     parts.push(`Quantity: ${units}`);
   }
 
-  return <Typography variant="body2">{parts.join(' | ')}</Typography>;
+  return <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>{parts.join(' | ')}</Typography>;
 };
 
 export const SearchResults = () => {
@@ -172,7 +187,7 @@ export const SearchResults = () => {
       <Typography variant="body2" color="text.secondary">
         Showing {combinations.length} of {total} results · Latest schedule {combinations[0]?.schedule_month} {combinations[0]?.schedule_year}
       </Typography>
-      <Grid container spacing={2}>
+      <Grid container spacing={{ xs: 1, sm: 2 }}>
         {combinations.map((combination) => (
           <Grid key={combination.id} item xs={12} md={6}>
             <ResultCard

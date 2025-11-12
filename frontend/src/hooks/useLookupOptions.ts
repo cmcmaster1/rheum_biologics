@@ -8,7 +8,8 @@ export type LookupResource =
   | 'formulations'
   | 'indications'
   | 'treatment-phases'
-  | 'hospital-types';
+  | 'hospital-types'
+  | 'pbs-codes';
 
 type LookupParams = Record<string, string | number | undefined>;
 

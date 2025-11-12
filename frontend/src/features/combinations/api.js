@@ -14,6 +14,7 @@ export const fetchCombinations = async (query) => {
         indication: stringifyList(query.indication),
         treatment_phase: stringifyList(query.treatment_phase),
         hospital_type: stringifyList(query.hospital_type),
+        pbs_code: stringifyList(query.pbs_code),
         limit: query.limit,
         offset: query.offset,
         sort: query.sort

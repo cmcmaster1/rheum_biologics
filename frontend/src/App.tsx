@@ -1,15 +1,16 @@
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
+import { useState } from 'react';
 
+import { DarkModeToggle } from './components/DarkModeToggle';
+import { FeedbackDialog } from './components/FeedbackDialog';
 import { FiltersPanel } from './components/filters/FiltersPanel';
 import { SearchResults } from './features/combinations/components/SearchResults';
-import { useState } from 'react';
-import { FeedbackDialog } from './components/FeedbackDialog';
 
 const App = () => {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: 'grey.100' }}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
+      <Container maxWidth="lg" sx={{ py: 4, px: { xs: 2, sm: 3 } }}>
         <Stack spacing={4}>
           <Stack spacing={1}>
             <Stack
@@ -34,14 +35,15 @@ const App = () => {
                   minWidth: { xs: 'auto', sm: '300px' }
                 }}
               >
-                We're looking for a sponsor. Email admin@rheumai.com to advertise in this space
+                We&apos;re looking for a sponsor. Email admin@rheumai.com to advertise in this space
               </Box>
             </Stack>
-            <Box>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <DarkModeToggle />
               <Button variant="outlined" size="small" onClick={() => setFeedbackOpen(true)}>
                 Send Feedback
               </Button>
-            </Box>
+            </Stack>
           </Stack>
 
           <FiltersPanel />

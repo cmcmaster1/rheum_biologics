@@ -11,6 +11,7 @@ export type CombinationQuery = {
   indication?: string[];
   treatment_phase?: string[];
   hospital_type?: string[];
+  pbs_code?: string[];
   limit: number;
   offset: number;
   sort?: string;
@@ -31,6 +32,7 @@ export const fetchCombinations = async (query: CombinationQuery): Promise<Combin
     indication: stringifyList(query.indication),
     treatment_phase: stringifyList(query.treatment_phase),
     hospital_type: stringifyList(query.hospital_type),
+    pbs_code: stringifyList(query.pbs_code),
     limit: query.limit,
     offset: query.offset,
     sort: query.sort

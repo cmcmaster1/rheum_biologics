@@ -8,6 +8,7 @@ const defaultState = {
     indication: [],
     treatmentPhase: [],
     hospitalType: [],
+    pbsCode: [],
     limit: 25,
     page: 1
 };

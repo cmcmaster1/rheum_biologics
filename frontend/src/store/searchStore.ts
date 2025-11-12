@@ -8,7 +8,8 @@ export type FilterKey =
   | 'formulation'
   | 'indication'
   | 'treatmentPhase'
-  | 'hospitalType';
+  | 'hospitalType'
+  | 'pbsCode';
 
 export type FilterState = {
   scheduleYear?: number;
@@ -19,6 +20,7 @@ export type FilterState = {
   indication: string[];
   treatmentPhase: string[];
   hospitalType: string[];
+  pbsCode: string[];
   limit: number;
   page: number;
 };
@@ -38,6 +40,7 @@ const defaultState: FilterState = {
   indication: [],
   treatmentPhase: [],
   hospitalType: [],
+  pbsCode: [],
   limit: 25,
   page: 1
 };

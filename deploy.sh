@@ -110,7 +110,7 @@ echo "✅ Backend deployment initiated"
 
 # Set GitHub variables for feedback system
 echo "🔧 Setting GitHub variables for feedback system..."
-GITHUB_OWNER="cmcmaster"
+GITHUB_OWNER="cmcmaster1"
 GITHUB_REPO="rheum_biologics"
 
 if [[ -z "${GITHUB_TOKEN:-}" ]]; then

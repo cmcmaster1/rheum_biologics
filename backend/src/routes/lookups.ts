@@ -6,6 +6,7 @@ import {
   getFormulations,
   getHospitalTypes,
   getIndications,
+  getPbsCodes,
   getTreatmentPhases
 } from '../controllers/lookupsController.js';
 
@@ -17,5 +18,6 @@ router.get('/brands', getBrands);
 router.get('/formulations', getFormulations);
 router.get('/treatment-phases', getTreatmentPhases);
 router.get('/hospital-types', getHospitalTypes);
+router.get('/pbs-codes', getPbsCodes);
 
 export const lookupsRouter = router;

@@ -10,6 +10,7 @@ export type CombinationFilters = {
   treatment_phase?: string[];
   hospital_type?: string[];
   authority_method?: string[];
+  pbs_code?: string[];
   sort?: string;
 };
 
@@ -126,6 +127,7 @@ export const searchCombinations = async (
     treatment_phase: normalizeArray(filterParams.treatment_phase),
     hospital_type: normalizeArray(filterParams.hospital_type),
     authority_method: normalizeArray(filterParams.authority_method),
+    pbs_code: normalizeArray(filterParams.pbs_code),
     sort: Array.isArray(filterParams.sort) ? filterParams.sort[0] : filterParams.sort
   };
 
@@ -150,6 +152,7 @@ export const searchCombinations = async (
   appendFilter(whereClauses, values, 'treatment_phase', filters.treatment_phase);
   appendFilter(whereClauses, values, 'hospital_type', filters.hospital_type);
   appendFilter(whereClauses, values, 'authority_method', filters.authority_method);
+  appendFilter(whereClauses, values, 'pbs_code', filters.pbs_code);
 
   const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
 
@@ -287,7 +290,8 @@ const LOOKUP_COLUMNS = new Set([
   'formulation',
   'indication',
   'treatment_phase',
-  'hospital_type'
+  'hospital_type',
+  'pbs_code'
 ]);
 
 export const getLookupValues = async (
@@ -313,6 +317,7 @@ export const getLookupValues = async (
     treatment_phase: normalizeArray(filterParams.treatment_phase),
     hospital_type: normalizeArray(filterParams.hospital_type),
     authority_method: normalizeArray(filterParams.authority_method),
+    pbs_code: normalizeArray(filterParams.pbs_code),
     sort: undefined
   };
 
@@ -343,6 +348,7 @@ export const getLookupValues = async (
   maybeAppend('treatment_phase', filters.treatment_phase);
   maybeAppend('hospital_type', filters.hospital_type);
   maybeAppend('authority_method', filters.authority_method);
+  maybeAppend('pbs_code', filters.pbs_code);
 
   const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
 

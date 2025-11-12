@@ -13,3 +13,4 @@ export const getFormulations = createLookupHandler('formulation');
 export const getIndications = createLookupHandler('indication');
 export const getTreatmentPhases = createLookupHandler('treatment_phase');
 export const getHospitalTypes = createLookupHandler('hospital_type');
+export const getPbsCodes = createLookupHandler('pbs_code');

@@ -1,4 +1,4 @@
-import { Button, Divider, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useCallback, useMemo } from 'react';
 
 import { useLookupOptions } from '../../hooks/useLookupOptions';
@@ -17,6 +17,7 @@ export const FiltersPanel = () => {
   const indication = useSearchStore((state) => state.indication);
   const treatmentPhase = useSearchStore((state) => state.treatmentPhase);
   const hospitalType = useSearchStore((state) => state.hospitalType);
+  const pbsCode = useSearchStore((state) => state.pbsCode);
   const setFilter = useSearchStore((state) => state.setFilter);
   const resetFilters = useSearchStore((state) => state.resetFilters);
 
@@ -35,10 +36,12 @@ export const FiltersPanel = () => {
         params.treatment_phase = treatmentPhase.join(',');
       if (exclude !== 'hospitalType' && hospitalType.length)
         params.hospital_type = hospitalType.join(',');
+      if (exclude !== 'pbsCode' && pbsCode.length)
+        params.pbs_code = pbsCode.join(',');
 
       return params;
     },
-    [brand, drug, formulation, hospitalType, indication, scheduleMonth, scheduleYear, treatmentPhase]
+    [brand, drug, formulation, hospitalType, indication, scheduleMonth, scheduleYear, treatmentPhase, pbsCode]
   );
 
   const drugsParams = useMemo(() => buildLookupParams('drug'), [buildLookupParams]);
@@ -53,6 +56,10 @@ export const FiltersPanel = () => {
     () => buildLookupParams('hospitalType'),
     [buildLookupParams]
   );
+  const pbsCodesParams = useMemo(
+    () => buildLookupParams('pbsCode'),
+    [buildLookupParams]
+  );
 
   const drugsQuery = useLookupOptions('drugs', drugsParams);
   const brandsQuery = useLookupOptions('brands', brandsParams);
@@ -60,6 +67,7 @@ export const FiltersPanel = () => {
   const formulationsQuery = useLookupOptions('formulations', formulationsParams);
   const treatmentPhasesQuery = useLookupOptions('treatment-phases', treatmentPhasesParams);
   const hospitalTypesQuery = useLookupOptions('hospital-types', hospitalTypesParams);
+  const pbsCodesQuery = useLookupOptions('pbs-codes', pbsCodesParams);
 
   return (
     <Paper elevation={0} variant="outlined" sx={{ p: 2.5 }}>
@@ -141,7 +149,7 @@ export const FiltersPanel = () => {
           </Stack>
         </Stack>
 
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="flex-end">
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
           <Stack flex={1} spacing={1}>
             <Typography variant="subtitle2" color="text.secondary">
               Hospital type
@@ -155,6 +163,23 @@ export const FiltersPanel = () => {
               loading={hospitalTypesQuery.isLoading}
             />
           </Stack>
+          <Stack flex={1} spacing={1}>
+            <Typography variant="subtitle2" color="text.secondary">
+              PBS Code
+            </Typography>
+            <MultiFilter
+              label="PBS Code"
+              placeholder="All PBS codes"
+              options={pbsCodesQuery.data ?? []}
+              value={pbsCode}
+              onChange={(values) => setFilter('pbsCode', values)}
+              loading={pbsCodesQuery.isLoading}
+            />
+          </Stack>
+        </Stack>
+
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="flex-end">
+          <Box flex={1} />
           <Divider flexItem orientation="vertical" sx={{ display: { xs: 'none', md: 'block' } }} />
           <Button variant="text" onClick={resetFilters} sx={{ alignSelf: { xs: 'stretch', md: 'center' } }}>
             Reset filters
