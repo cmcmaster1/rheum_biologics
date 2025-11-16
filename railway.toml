@@ -1,0 +1,19 @@
+[services.backend]
+root = "backend"
+
+[services.backend.build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[services.backend.deploy]
+startCommand = "npm start"
+
+[services.frontend]
+root = "frontend"
+
+[services.frontend.build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[services.frontend.deploy]
+startCommand = "/start.sh"
