@@ -1,6 +1,6 @@
 # Rheumatology Biologics Lookup
 
-A modern, server-hosted web application for rheumatologists to explore Pharmaceutical Benefits Scheme (PBS) biologics data. The system replaces the legacy Gradio prototype with a modular architecture consisting of a TypeScript/Express API, PostgreSQL storage, a React + MUI frontend, and an in-process Node.js ingestion job that pulls PBS CSV exports directly from the official PBS website into the biologics database.
+A modern, server-hosted web application for rheumatologists to explore Pharmaceutical Benefits Scheme (PBS) biologics data. The system replaces the legacy Gradio prototype with a modular architecture consisting of a TypeScript/Express API, PostgreSQL storage, a React + MUI frontend, and an in-process Node.js ingestion job that pulls PBS data from the official PBS API v3 (Australian Department of Health) into the biologics database.
 
 ## Project Structure
 
@@ -36,6 +36,8 @@ npm run dev
 **Environment Variables:**
 - `DATABASE_URL` – PostgreSQL connection string
 - `PORT` – API server port (default: 3001)
+- `PBS_API_BASE_URL` – PBS API base URL (default: https://data-api.health.gov.au/pbs/api/v3)
+- `PBS_API_SUBSCRIPTION_KEY` – PBS API subscription key (defaults to public unregistered user key, can be overridden)
 - `GITHUB_TOKEN` – Personal access token for creating feedback issues
 - `GITHUB_OWNER` – GitHub username/organization (default: cmcmaster)
 - `GITHUB_REPO` – Repository name (default: rheum_biologics)

@@ -1,16 +1,23 @@
-import { Open } from 'unzipper';
-import Papa from 'papaparse';
-
 import { replaceScheduleData, type NewBiologicsCombination } from '../services/biologicsService.js';
 
-const REQUIRED_FILES = {
-  items: 'tables_as_csv/items.csv',
-  indications: 'tables_as_csv/indications.csv',
-  prescribingTexts: 'tables_as_csv/prescribing-texts.csv',
-  itemPrescribingTexts: 'tables_as_csv/item-prescribing-text-relationships.csv',
-  restrictions: 'tables_as_csv/restrictions.csv',
-  itemRestrictions: 'tables_as_csv/item-restriction-relationships.csv',
-  restrictionPrescribingTexts: 'tables_as_csv/restriction-prescribing-text-relationships.csv'
+// PBS API v3 Configuration
+// Base URL for the Australian Department of Health PBS API
+// Documentation: https://data-api-portal.health.gov.au/api-details#api=pbs-api-public-v3&operation=get-api-v3
+// API Specification: OpenAPI 3.0.1 (see pbs-api-public-v3.yaml)
+const PBS_API_BASE_URL = process.env.PBS_API_BASE_URL || 'https://data-api.health.gov.au/pbs/api/v3';
+// Default subscription key for unregistered public users (can be overridden via environment variable)
+const PBS_API_SUBSCRIPTION_KEY = process.env.PBS_API_SUBSCRIPTION_KEY || '2384af7c667342ceb5a736fe29f1dc6b';
+
+// API endpoint paths (from OpenAPI spec)
+const API_ENDPOINTS = {
+  items: '/items',
+  indications: '/indications',
+  prescribingTexts: '/prescribing-texts',
+  itemPrescribingTexts: '/item-prescribing-text-relationships',
+  restrictions: '/restrictions',
+  itemRestrictions: '/item-restriction-relationships',
+  restrictionPrescribingTexts: '/restriction-prescribing-text-relationships',
+  schedules: '/schedules'
 } as const;
 
 const BIOLOGICS = [
@@ -126,89 +133,322 @@ const matchRheumaticIndication = (condition: string | null | undefined): string 
   return null;
 };
 
-const getDownloadUrl = (date: Date): string => {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  return `https://www.pbs.gov.au/downloads/${year}/${month}/${year}-${month}-01-PBS-API-CSV-files.zip`;
-};
+/**
+ * Fetches data from a PBS API endpoint
+ * Handles pagination if the API supports it
+ * 
+ * TODO: Adjust this function based on actual API response structure:
+ * - Check if API uses pagination (page, offset, cursor, etc.)
+ * - Verify response format (data wrapper, direct array, etc.)
+ * - Handle authentication headers if required
+ */
+const fetchApiData = async <T = CsvRow>(
+  endpoint: string,
+  scheduleCode?: string
+): Promise<T[]> => {
+  // Construct full URL - base URL is https://data-api.health.gov.au/pbs/api/v3
+  // endpoint should be like '/schedules' or 'schedules'
+  const endpointPath = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  // Simply concatenate - base URL already includes the full path
+  const fullUrl = `${PBS_API_BASE_URL}${endpointPath}`;
+  const url = new URL(fullUrl);
+  
+  // Add schedule_code filter if provided (API supports filtering by schedule_code)
+  // Note: schedule_code is a string identifier, not a date
+  // To get the schedule_code for a date, query the /schedules endpoint first
+  if (scheduleCode) {
+    url.searchParams.set('schedule_code', scheduleCode);
+  }
 
-const resolveScheduleToDownload = async (
-  targetDate: Date,
-  lookbackMonths: number
-): Promise<{ date: Date; url: string }> => {
-  const start = new Date(Date.UTC(targetDate.getUTCFullYear(), targetDate.getUTCMonth(), 1));
+  const headers: HeadersInit = {
+    'Accept': 'application/json',
+  };
 
-  for (let offset = 0; offset < lookbackMonths; offset += 1) {
-    const candidate = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() - offset, 1));
-    const url = getDownloadUrl(candidate);
+  // Add subscription key (API uses Subscription-Key header per OpenAPI spec)
+  if (PBS_API_SUBSCRIPTION_KEY) {
+    headers['Subscription-Key'] = PBS_API_SUBSCRIPTION_KEY;
+  }
+
+  // Set default limit (API supports limit parameter)
+  // Note: Public API has rate limits (check x-rate-limit-remaining header)
+  const limit = 1000; // Maximum reasonable page size
+  url.searchParams.set('limit', String(limit));
+
+  const allData: T[] = [];
+  let hasMore = true;
+  let page = 1;
+  const maxPages = 1000; // Safety limit
+
+  while (hasMore && page <= maxPages) {
+    // API uses page-based pagination
+    if (page > 1) {
+      url.searchParams.set('page', String(page));
+    }
 
     try {
-      const response = await fetch(url, { method: 'HEAD' });
-      if (response.ok) {
-        return { date: candidate, url };
+      const response = await fetch(url.toString(), { 
+        headers
+      });
+      
+      // Handle rate limiting (429) with retry
+      if (response.status === 429) {
+        const rateLimitReset = response.headers.get('x-rate-limit-reset');
+        const waitTime = rateLimitReset 
+          ? Math.max(Number.parseInt(rateLimitReset, 10) * 1000, 10000) 
+          : 10000;
+        console.log(`[BiologicsIngestion] Rate limit exceeded, waiting ${Math.ceil(waitTime / 1000)}s before retry...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        // Retry the same request
+        continue;
+      }
+      
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unable to read error response');
+        throw new Error(
+          `PBS API request failed for ${endpoint}: ${response.status} ${response.statusText}\n${errorText.substring(0, 500)}`
+        );
+      }
+
+      const data = await response.json();
+      
+      // API returns { _meta: {...}, _links: {...}, data: [...] }
+      let items: T[] = [];
+      if (data.data && Array.isArray(data.data)) {
+        items = data.data;
+      } else if (Array.isArray(data)) {
+        // Fallback: direct array response
+        items = data;
+      } else {
+        console.warn(`Unexpected API response structure for ${endpoint}:`, Object.keys(data));
+        items = [];
+      }
+      
+      // Log pagination info from _meta if available
+      if (data._meta) {
+        console.log(`[BiologicsIngestion] Fetched page ${data._meta.page || page} of ${endpoint}: ${items.length} items (total: ${data._meta.total_records || 'unknown'})`);
+      }
+
+      allData.push(...items);
+
+      // Check if there are more pages based on _meta or item count
+      const totalRecords = data._meta?.total_records;
+      const currentPage = data._meta?.page || page;
+      const itemsPerPage = data._meta?.count || items.length;
+      
+      if (totalRecords !== undefined) {
+        const totalPages = Math.ceil(totalRecords / limit);
+        hasMore = currentPage < totalPages;
+      } else {
+        // Fallback: if we got fewer items than the limit, we've reached the last page
+        hasMore = items.length >= limit;
+      }
+
+      // If no items returned, assume no more pages
+      if (items.length === 0) {
+        hasMore = false;
+      }
+      
+      // Rate limiting: Check remaining requests from response headers
+      const rateLimitRemaining = response.headers.get('x-rate-limit-remaining');
+      const rateLimitLimit = response.headers.get('x-rate-limit-limit');
+      const rateLimitReset = response.headers.get('x-rate-limit-reset');
+      
+      if (rateLimitRemaining && Number.parseInt(rateLimitRemaining, 10) <= 1 && hasMore) {
+        const waitTime = rateLimitReset 
+          ? Math.max(Number.parseInt(rateLimitReset, 10) * 1000, 10000) 
+          : 10000; // Default 10 seconds if no reset time provided
+        console.log(`[BiologicsIngestion] Rate limit low (${rateLimitRemaining}/${rateLimitLimit}), waiting ${Math.ceil(waitTime / 1000)}s before next request...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+      
+      if (hasMore) {
+        page += 1;
       }
     } catch (error) {
-      console.warn(`Failed to reach PBS download for ${url}:`, error);
+      // Retry network errors (but not too many times)
+      const maxRetries = 3;
+      let retryCount = 0;
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        while (retryCount < maxRetries) {
+          retryCount += 1;
+          console.log(`[BiologicsIngestion] Network error on ${endpoint}, retry ${retryCount}/${maxRetries}...`);
+          await new Promise(resolve => setTimeout(resolve, 5000 * retryCount)); // Exponential backoff
+          
+          try {
+            const retryResponse = await fetch(url.toString(), { headers });
+            if (retryResponse.ok) {
+              // Success, continue with normal processing
+              const retryData = await retryResponse.json();
+              let retryItems: T[] = [];
+              if (retryData.data && Array.isArray(retryData.data)) {
+                retryItems = retryData.data;
+              } else if (Array.isArray(retryData)) {
+                retryItems = retryData;
+              }
+              
+              if (retryData._meta) {
+                console.log(`[BiologicsIngestion] Fetched page ${retryData._meta.page || page} of ${endpoint}: ${retryItems.length} items (total: ${retryData._meta.total_records || 'unknown'})`);
+              }
+              
+              allData.push(...retryItems);
+              
+              const totalRecords = retryData._meta?.total_records;
+              const currentPage = retryData._meta?.page || page;
+              if (totalRecords !== undefined) {
+                const totalPages = Math.ceil(totalRecords / limit);
+                hasMore = currentPage < totalPages;
+              } else {
+                hasMore = retryItems.length >= limit;
+              }
+              
+              if (retryItems.length === 0) {
+                hasMore = false;
+              }
+              
+              if (hasMore) {
+                page += 1;
+              }
+              
+              continue; // Successfully retried, continue the loop
+            }
+          } catch (retryError) {
+            // Retry also failed, continue to next retry attempt
+            if (retryCount >= maxRetries) {
+              throw new Error(`Failed to fetch data from ${endpoint} after ${maxRetries} retries: ${error instanceof Error ? error.message : String(error)}`);
+            }
+          }
+        }
+      } else {
+        // Not a network error, throw immediately
+        throw new Error(`Failed to fetch data from ${endpoint}: ${error instanceof Error ? error.message : String(error)}`);
+      }
     }
   }
 
-  throw new Error(`Unable to locate a downloadable PBS schedule within ${lookbackMonths} months`);
+  return allData;
 };
 
-const downloadZip = async (url: string): Promise<Buffer> => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to download PBS archive ${url} (status ${response.status})`);
-  }
-  const arrayBuffer = await response.arrayBuffer();
-  return Buffer.from(arrayBuffer);
-};
-
-const parseCsv = (content: string): CsvRow[] => {
-  const result = Papa.parse<CsvRow>(content, {
-    header: true,
-    skipEmptyLines: true,
-    dynamicTyping: false
-  });
-
-  if (result.errors.length > 0) {
-    console.warn('Encountered CSV parse errors:', result.errors.slice(0, 3));
-  }
-
-  return result.data.filter((row: any) =>
-    Object.values(row).some((value) => {
-      if (value === undefined || value === null) return false;
-      return String(value).trim() !== '' && String(value).trim().toLowerCase() !== 'null';
-    })
+/**
+ * Finds the schedule_code for a given date by querying the /schedules endpoint
+ */
+const findScheduleCode = async (targetDate: Date, lookbackMonths: number): Promise<string | null> => {
+  console.log('[BiologicsIngestion] Finding schedule code...');
+  
+  // Query schedules endpoint to find matching schedule_code
+  const schedules = await fetchApiData<{ schedule_code: string; effective_year: number; effective_month: number }>(
+    API_ENDPOINTS.schedules
   );
-};
-
-const extractTables = async (zipBuffer: Buffer): Promise<RequiredTables> => {
-  const archive = await Open.buffer(zipBuffer);
-  const tables: Partial<RequiredTables> = {};
-
-  for (const [key, expectedPath] of Object.entries(REQUIRED_FILES)) {
-    const entry = archive.files.find((file: any) => file.path.toLowerCase().endsWith(expectedPath));
-    if (!entry) {
-      throw new Error(`PBS archive missing required file: ${expectedPath}`);
+  
+  // Try to find schedule matching target date, then look back
+  for (let offset = 0; offset < lookbackMonths; offset += 1) {
+    const candidateYear = targetDate.getUTCFullYear();
+    const candidateMonth = targetDate.getUTCMonth() + 1 - offset;
+    
+    // Handle month/year rollover
+    let year = candidateYear;
+    let month = candidateMonth;
+    while (month < 1) {
+      month += 12;
+      year -= 1;
     }
-
-    const buffer = await entry.buffer();
-    tables[key as keyof RequiredTables] = parseCsv(buffer.toString('utf-8'));
+    
+    const matchingSchedule = schedules.find(
+      (s) => s.effective_year === year && s.effective_month === month
+    );
+    
+    if (matchingSchedule) {
+      console.log(`[BiologicsIngestion] Found schedule_code ${matchingSchedule.schedule_code} for ${year}-${String(month).padStart(2, '0')}`);
+      return matchingSchedule.schedule_code;
+    }
   }
-
-  return tables as RequiredTables;
+  
+  // If no match found, try to get the latest schedule
+  if (schedules.length > 0) {
+    // Sort by year and month descending to get latest
+    const sorted = schedules.sort((a, b) => {
+      if (a.effective_year !== b.effective_year) {
+        return b.effective_year - a.effective_year;
+      }
+      return b.effective_month - a.effective_month;
+    });
+    const latest = sorted[0];
+    console.log(`[BiologicsIngestion] Using latest available schedule_code ${latest.schedule_code} (${latest.effective_year}-${String(latest.effective_month).padStart(2, '0')})`);
+    return latest.schedule_code;
+  }
+  
+  return null;
 };
 
-const buildScheduleMeta = (date: Date): ScheduleMeta => {
-  const year = date.getUTCFullYear();
-  const code = `${year}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+/**
+ * Fetches all required tables from the PBS API
+ */
+const fetchTables = async (scheduleCode: string): Promise<RequiredTables> => {
+  console.log(`[BiologicsIngestion] Fetching data from PBS API for schedule_code ${scheduleCode}...`);
+  
+  // Note: Due to rate limiting, we fetch sequentially
+  // The API returns rate limit info in response headers (x-rate-limit-remaining)
+  console.log('[BiologicsIngestion] Fetching items...');
+  const items = await fetchApiData<CsvRow>(API_ENDPOINTS.items, scheduleCode);
+  
+  console.log('[BiologicsIngestion] Fetching indications...');
+  const indications = await fetchApiData<CsvRow>(API_ENDPOINTS.indications, scheduleCode);
+  
+  console.log('[BiologicsIngestion] Fetching prescribing texts...');
+  const prescribingTexts = await fetchApiData<CsvRow>(API_ENDPOINTS.prescribingTexts, scheduleCode);
+  
+  console.log('[BiologicsIngestion] Fetching item-prescribing-text relationships...');
+  const itemPrescribingTexts = await fetchApiData<CsvRow>(API_ENDPOINTS.itemPrescribingTexts, scheduleCode);
+  
+  console.log('[BiologicsIngestion] Fetching restrictions...');
+  const restrictions = await fetchApiData<CsvRow>(API_ENDPOINTS.restrictions, scheduleCode);
+  
+  console.log('[BiologicsIngestion] Fetching item-restriction relationships...');
+  const itemRestrictions = await fetchApiData<CsvRow>(API_ENDPOINTS.itemRestrictions, scheduleCode);
+  
+  console.log('[BiologicsIngestion] Fetching restriction-prescribing-text relationships...');
+  const restrictionPrescribingTexts = await fetchApiData<CsvRow>(API_ENDPOINTS.restrictionPrescribingTexts, scheduleCode);
+
   return {
+    items,
+    indications,
+    prescribingTexts,
+    itemPrescribingTexts,
+    restrictions,
+    itemRestrictions,
+    restrictionPrescribingTexts
+  };
+};
+
+/**
+ * Resolves schedule information from schedule_code
+ * Fetches schedule details to get the actual date
+ */
+const resolveScheduleFromCode = async (scheduleCode: string): Promise<{ date: Date; code: string; year: number; month: string }> => {
+  const schedules = await fetchApiData<{ 
+    schedule_code: string; 
+    effective_year: number; 
+    effective_month: number;
+    effective_date?: string;
+  }>(API_ENDPOINTS.schedules);
+  
+  const schedule = schedules.find((s) => s.schedule_code === scheduleCode);
+  
+  if (!schedule) {
+    throw new Error(`Schedule code ${scheduleCode} not found`);
+  }
+  
+  const date = new Date(Date.UTC(schedule.effective_year, schedule.effective_month - 1, 1));
+  const code = `${schedule.effective_year}-${String(schedule.effective_month).padStart(2, '0')}`;
+  
+  return {
+    date,
     code,
-    year,
+    year: schedule.effective_year,
     month: monthName(date)
   };
 };
+
 
 const buildCombinationRows = (tables: RequiredTables, schedule: ScheduleMeta): NewBiologicsCombination[] => {
   const restrictionLookup = new Map<string, CsvRow>();
@@ -368,12 +608,24 @@ export const runBiologicsIngestion = async (
   const targetDate = options.targetDate ?? new Date();
   const lookbackMonths = options.lookbackMonths ?? 6;
 
-  const { date, url } = await resolveScheduleToDownload(targetDate, lookbackMonths);
-  console.log(`[BiologicsIngestion] Downloading PBS schedule from ${url}`);
+  // Find the schedule_code for the target date
+  const scheduleCode = await findScheduleCode(targetDate, lookbackMonths);
+  
+  if (!scheduleCode) {
+    throw new Error(`Unable to find a valid schedule_code within ${lookbackMonths} months of target date`);
+  }
 
-  const zip = await downloadZip(url);
-  const tables = await extractTables(zip);
-  const schedule = buildScheduleMeta(date);
+  // Fetch all data for this schedule_code
+  const tables = await fetchTables(scheduleCode);
+  
+  // Resolve schedule metadata from schedule_code
+  const scheduleInfo = await resolveScheduleFromCode(scheduleCode);
+  const schedule: ScheduleMeta = {
+    code: scheduleInfo.code,
+    year: scheduleInfo.year,
+    month: scheduleInfo.month
+  };
+  
   const combinations = buildCombinationRows(tables, schedule);
 
   if (combinations.length === 0) {

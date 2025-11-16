@@ -70,7 +70,9 @@ BIOLOGICS_INGEST_ENABLED=true
 BIOLOGICS_INGEST_CRON=0 4 1 * *
 BIOLOGICS_INGEST_TZ=Australia/Sydney
 BIOLOGICS_INGEST_LOOKBACK=3
-# Note: No external API tokens required - data is sourced directly from PBS website
+# PBS API Configuration (optional - defaults to public unregistered user key)
+PBS_API_BASE_URL=https://data-api.health.gov.au/pbs/api/v3
+PBS_API_SUBSCRIPTION_KEY=<your-subscription-key-if-you-have-a-registered-account>
 ```
 
 #### Optional Environment Variables:
@@ -174,7 +176,7 @@ To add custom domains:
 1. **Database Connection Issues**: Ensure `DATABASE_URL` is set correctly
 2. **CORS Issues**: Check `CORS_ORIGIN` matches your frontend URL
 3. **Build Failures**: Check logs for missing dependencies or build errors
-4. **Ingestion Failures**: Check that PBS website is accessible and CSV files are available
+4. **Ingestion Failures**: Check that PBS API is accessible and API credentials are correct (if required)
 
 ### Useful Commands:
 
