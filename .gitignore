@@ -78,6 +78,7 @@ jspm_packages/
 # Gatsby files
 .cache/
 public
+!/frontend/public
 
 # Storybook build outputs
 .out
@@ -112,3 +113,5 @@ Thumbs.db
 
 # Logs
 logs/
+
+railway_token.txt

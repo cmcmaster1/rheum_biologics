@@ -35,14 +35,22 @@ const sampleCombination = {
 };
 
 describe('biologicsService', () => {
+  const makeResult = <T>(rows: T[]): any => ({
+    command: 'SELECT',
+    rowCount: rows.length,
+    oid: 0,
+    fields: [],
+    rows
+  });
+
   beforeEach(() => {
     mockQuery.mockReset();
   });
 
   it('builds queries for combination search filters and pagination', async () => {
     mockQuery
-      .mockResolvedValueOnce({ rows: [sampleCombination] })
-      .mockResolvedValueOnce({ rows: [{ total: '1' }] });
+      .mockResolvedValueOnce(makeResult([sampleCombination]))
+      .mockResolvedValueOnce(makeResult([{ total: '1' }]));
 
     const result = await searchCombinations({ drug: 'Drug A' }, 10, 0);
 
@@ -63,9 +71,9 @@ describe('biologicsService', () => {
   });
 
   it('skips the lookup column when filtering lookup values', async () => {
-    mockQuery.mockResolvedValueOnce({
-      rows: [{ brand: 'Brand X' }, { brand: 'Brand Y' }]
-    });
+    mockQuery.mockResolvedValueOnce(
+      makeResult([{ brand: 'Brand X' }, { brand: 'Brand Y' }])
+    );
 
     const values = await getLookupValues('brand', {
       drug: 'Drug X',
@@ -88,16 +96,16 @@ describe('biologicsService', () => {
   });
 
   it('returns schedules in descending order', async () => {
-    mockQuery.mockResolvedValueOnce({
-      rows: [
+    mockQuery.mockResolvedValueOnce(
+      makeResult([
         {
           schedule_year: 2025,
           schedule_month: 'JANUARY',
           schedule_code: '2025-01',
           latest: true
         }
-      ]
-    });
+      ])
+    );
 
     const schedules = await getSchedules();
 

@@ -21,6 +21,9 @@ FROM nginx:alpine
 # Copy built files to nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# Ensure favicon is present (copied from build output)
+COPY --from=build /app/dist/favicon.ico /usr/share/nginx/html/favicon.ico
+
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
