@@ -129,7 +129,6 @@ const SpecialtyPage = ({
   return (
     <Stack spacing={3}>
       <Hero title={title} subtitle={description} />
-      <SponsorBanner />
       <SearchSection />
     </Stack>
   );
@@ -151,7 +150,6 @@ const LandingPage = () => {
         title="Welcome to PBS Biologics Lookup"
         subtitle="Your comprehensive resource on PBS-listed authority medicines. Choose a specialty to explore authority criteria, treatment phases, brands, and PBS item details."
       />
-      <SponsorBanner />
       <Grid container spacing={2}>
         {shortcuts.map((link) => (
           <Grid key={link.to} item xs={12} md={4}>
@@ -236,7 +234,9 @@ const App = () => {
                 />
               ))}
             </Tabs>
-            <SponsorBanner />
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: 'auto' }}>
+              <SponsorBanner />
+            </Stack>
           </Toolbar>
         </Container>
       </AppBar>
