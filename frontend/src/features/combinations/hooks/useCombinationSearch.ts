@@ -6,6 +6,7 @@ import { fetchCombinations } from '../api';
 
 export const useCombinationSearch = () => {
   const filters = useSearchStore((state) => ({
+    specialty: state.specialty,
     scheduleYear: state.scheduleYear,
     scheduleMonth: state.scheduleMonth,
     drug: state.drug,
@@ -22,6 +23,7 @@ export const useCombinationSearch = () => {
   const queryParams = useMemo(() => {
     const offset = (filters.page - 1) * filters.limit;
     return {
+      specialty: filters.specialty,
       schedule_year: filters.scheduleYear,
       schedule_month: filters.scheduleMonth,
       drug: [...filters.drug],

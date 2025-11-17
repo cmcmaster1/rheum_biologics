@@ -13,7 +13,8 @@ const REQUIRED_FILES = {
   restrictionPrescribingTexts: 'tables_as_csv/restriction-prescribing-text-relationships.csv'
 } as const;
 
-const BIOLOGICS = [
+const TARGET_DRUGS = [
+  // Rheumatology
   'adalimumab',
   'etanercept',
   'infliximab',
@@ -32,18 +33,67 @@ const BIOLOGICS = [
   'anifrolumab',
   'bimekizumab',
   'avacopan',
-  'risankizumab'
+  'risankizumab',
+  // Dermatology
+  'dupilumab',
+  'apremilast',
+  'tildrakizumab',
+  'deucravacitinib',
+  'ciclosporin',
+  'pimecrolimus',
+  'acitretin',
+  'isotretinoin',
+  'methotrexate',
+  'omalizumab',
+  // Gastroenterology
+  'vedolizumab',
+  'ozanimod',
+  'etrasimod',
+  'teduglutide',
+  'octreotide',
+  'imatinib',
+  'sunitinib',
+  'ripretinib',
+  'mesalazine',
+  'balsalazide',
+  'olsalazine',
+  'budesonide',
+  'vancomycin'
 ];
 
-const RHEUMATIC_DISEASES = [
-  'rheumatoid arthritis',
-  'psoriatic arthritis',
-  'ankylosing spondylitis',
-  'non-radiographic axial spondyloarthritis',
-  'giant cell arteritis',
-  'juvenile idiopathic arthritis',
-  'systemic lupus erythematosus',
-  'anti-neutrophil cytoplasmic autoantibody (anca) associated vasculitis'
+type IndicationMatcher = { keywords: string[]; label: string };
+
+const INDICATION_MATCHERS: IndicationMatcher[] = [
+  // Rheumatology
+  {
+    keywords: ['anti-neutrophil cytoplasmic autoantibody (anca) associated vasculitis'],
+    label: 'Anti-neutrophil Cytoplasmic Autoantibody (ANCA) Associated Vasculitis'
+  },
+  { keywords: ['systemic lupus erythematosus'], label: 'Systemic Lupus Erythematosus' },
+  { keywords: ['juvenile idiopathic arthritis'], label: 'Juvenile Idiopathic Arthritis' },
+  { keywords: ['giant cell arteritis'], label: 'Giant Cell Arteritis' },
+  { keywords: ['non-radiographic axial spondyloarthritis'], label: 'Non-radiographic Axial Spondyloarthritis' },
+  { keywords: ['ankylosing spondylitis'], label: 'Ankylosing Spondylitis' },
+  { keywords: ['psoriatic arthritis'], label: 'Psoriatic Arthritis' },
+  { keywords: ['rheumatoid arthritis'], label: 'Rheumatoid Arthritis' },
+  // Dermatology
+  { keywords: ['hidradenitis suppurativa'], label: 'Hidradenitis Suppurativa' },
+  {
+    keywords: ['psoriasis', 'chronic plaque psoriasis', 'scalp psoriasis', 'intractable psoriasis'],
+    label: 'Psoriasis'
+  },
+  { keywords: ['atopic dermatitis'], label: 'Atopic Dermatitis' },
+  { keywords: ['chronic spontaneous urticaria'], label: 'Chronic Spontaneous Urticaria' },
+  { keywords: ['cystic acne'], label: 'Cystic Acne' },
+  { keywords: ['acne'], label: 'Acne' },
+  // Gastroenterology
+  { keywords: ['fistulising crohn', "crohn disease", "crohn's disease"], label: 'Crohn Disease' },
+  { keywords: ['ulcerative colitis'], label: 'Ulcerative Colitis' },
+  { keywords: ['gastrointestinal stromal tumour'], label: 'Gastrointestinal Stromal Tumour' },
+  { keywords: ['short bowel syndrome'], label: 'Short Bowel Syndrome' },
+  { keywords: ['intestinal failure'], label: 'Intestinal Failure' },
+  { keywords: ['pseudomembranous colitis'], label: 'Pseudomembranous Colitis' },
+  { keywords: ['vasoactive intestinal peptide secreting tumour', 'vipoma'], label: 'Vasoactive Intestinal Peptide Secreting Tumour' }
 ];
 
 type CsvRow = Record<string, string | null>;
@@ -109,18 +159,15 @@ const toTitleCase = (value: string): string =>
 
 const matchesBiologic = (drugName: string): boolean => {
   const lowered = drugName.toLowerCase();
-  return BIOLOGICS.some((name) => lowered.includes(name));
+  return TARGET_DRUGS.some((name) => lowered.includes(name));
 };
 
-const matchRheumaticIndication = (condition: string | null | undefined): string | null => {
+const matchIndication = (condition: string | null | undefined): string | null => {
   if (!condition) return null;
   const lowered = condition.toLowerCase();
-  for (const disease of RHEUMATIC_DISEASES) {
-    if (lowered.includes(disease)) {
-      return disease
-        .split(' ')
-        .map((word) => (word.length > 0 ? word[0].toUpperCase() + word.slice(1) : word))
-        .join(' ');
+  for (const matcher of INDICATION_MATCHERS) {
+    if (matcher.keywords.some((keyword) => lowered.includes(keyword))) {
+      return matcher.label;
     }
   }
   return null;
@@ -307,9 +354,7 @@ const buildCombinationRows = (tables: RequiredTables, schedule: ScheduleMeta): N
       let matchedIndication: string | null = null;
       for (const prescribingId of prescribingIds) {
         const indicationRow = indicationLookup.get(prescribingId);
-        const indication = matchRheumaticIndication(
-          indicationRow?.condition as string | null | undefined
-        );
+        const indication = matchIndication(indicationRow?.condition as string | null | undefined);
         if (indication) {
           matchedIndication = indication;
           break;

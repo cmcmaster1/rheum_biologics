@@ -3,6 +3,7 @@ import { apiClient } from '../../api/client';
 import { CombinationResponse } from './types';
 
 export type CombinationQuery = {
+  specialty?: string;
   schedule_year?: number;
   schedule_month?: string;
   drug?: string[];
@@ -24,6 +25,7 @@ const stringifyList = (value?: string[]) => {
 
 export const fetchCombinations = async (query: CombinationQuery): Promise<CombinationResponse> => {
   const params = {
+    specialty: query.specialty,
     schedule_year: query.schedule_year,
     schedule_month: query.schedule_month,
     drug: stringifyList(query.drug),

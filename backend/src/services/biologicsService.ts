@@ -1,6 +1,7 @@
 import { pool, query } from '../db/pool.js';
 
 export type CombinationFilters = {
+  specialty?: 'rheumatology' | 'dermatology' | 'gastroenterology';
   schedule_year?: number;
   schedule_month?: string;
   drug?: string[];
@@ -30,6 +31,109 @@ const SORT_COLUMNS: Record<string, string> = {
   indication: 'indication ASC',
   schedule: 'schedule_year DESC, schedule_month_date DESC',
   default: 'drug ASC, brand ASC'
+};
+
+const SPECIALTY_SCOPES: Record<
+  CombinationFilters['specialty'],
+  { indications: string[]; drugs: string[] }
+> = {
+  rheumatology: {
+    indications: [
+      'Rheumatoid Arthritis',
+      'Psoriatic Arthritis',
+      'Ankylosing Spondylitis',
+      'Non-radiographic Axial Spondyloarthritis',
+      'Giant Cell Arteritis',
+      'Juvenile Idiopathic Arthritis',
+      'Systemic Lupus Erythematosus',
+      'Anti-neutrophil Cytoplasmic Autoantibody (ANCA) Associated Vasculitis'
+    ],
+    drugs: [
+      'Adalimumab',
+      'Etanercept',
+      'Infliximab',
+      'Certolizumab',
+      'Golimumab',
+      'Rituximab',
+      'Abatacept',
+      'Tocilizumab',
+      'Secukinumab',
+      'Ixekizumab',
+      'Ustekinumab',
+      'Guselkumab',
+      'Tofacitinib',
+      'Baricitinib',
+      'Upadacitinib',
+      'Anifrolumab',
+      'Bimekizumab',
+      'Avacopan',
+      'Risankizumab'
+    ]
+  },
+  dermatology: {
+    indications: [
+      'Psoriasis',
+      'Hidradenitis Suppurativa',
+      'Atopic Dermatitis',
+      'Chronic Spontaneous Urticaria',
+      'Cystic Acne',
+      'Acne'
+    ],
+    drugs: [
+      'Adalimumab',
+      'Etanercept',
+      'Infliximab',
+      'Ustekinumab',
+      'Secukinumab',
+      'Ixekizumab',
+      'Guselkumab',
+      'Risankizumab',
+      'Tildrakizumab',
+      'Bimekizumab',
+      'Deucravacitinib',
+      'Apremilast',
+      'Dupilumab',
+      'Ciclosporin',
+      'Pimecrolimus',
+      'Acitretin',
+      'Isotretinoin',
+      'Methotrexate',
+      'Omalizumab',
+      'Upadacitinib'
+    ]
+  },
+  gastroenterology: {
+    indications: [
+      'Crohn Disease',
+      'Ulcerative Colitis',
+      'Gastrointestinal Stromal Tumour',
+      'Short Bowel Syndrome',
+      'Intestinal Failure',
+      'Pseudomembranous Colitis',
+      'Vasoactive Intestinal Peptide Secreting Tumour'
+    ],
+    drugs: [
+      'Adalimumab',
+      'Infliximab',
+      'Ustekinumab',
+      'Vedolizumab',
+      'Golimumab',
+      'Upadacitinib',
+      'Tofacitinib',
+      'Ozanimod',
+      'Etrasimod',
+      'Budesonide',
+      'Mesalazine',
+      'Balsalazide',
+      'Olsalazine',
+      'Imatinib',
+      'Sunitinib',
+      'Ripretinib',
+      'Octreotide',
+      'Teduglutide',
+      'Vancomycin'
+    ]
+  }
 };
 
 const normalizeArray = (value?: string | string[]): string[] | undefined => {
@@ -116,6 +220,9 @@ export const searchCombinations = async (
   offset: number
 ): Promise<PaginatedResult<BiologicsCombination>> => {
   const filters: CombinationFilters = {
+    specialty: (Array.isArray(filterParams.specialty)
+      ? filterParams.specialty[0]
+      : filterParams.specialty) as CombinationFilters['specialty'],
     schedule_year: filterParams.schedule_year ? Number(filterParams.schedule_year) : undefined,
     schedule_month: Array.isArray(filterParams.schedule_month)
       ? filterParams.schedule_month[0]
@@ -134,6 +241,7 @@ export const searchCombinations = async (
 
   const whereClauses: string[] = [];
   const values: unknown[] = [];
+  const specialtyScope = filters.specialty ? SPECIALTY_SCOPES[filters.specialty] : undefined;
 
   if (filters.schedule_year) {
     values.push(filters.schedule_year);
@@ -143,6 +251,11 @@ export const searchCombinations = async (
   if (filters.schedule_month) {
     values.push(filters.schedule_month);
     whereClauses.push(`schedule_month = $${values.length}`);
+  }
+
+  if (specialtyScope) {
+    values.push(specialtyScope.indications);
+    whereClauses.push(`indication = ANY($${values.length})`);
   }
 
   appendFilter(whereClauses, values, 'drug', filters.drug);
@@ -302,10 +415,13 @@ export const getLookupValues = async (
     throw Object.assign(new Error(`Unsupported lookup column: ${column}`), { status: 400 });
   }
 
-    const whereClauses: string[] = [];
+  const whereClauses: string[] = [];
   const values: unknown[] = [];
 
   const filters: CombinationFilters = {
+    specialty: (Array.isArray(filterParams.specialty)
+      ? filterParams.specialty[0]
+      : filterParams.specialty) as CombinationFilters['specialty'],
     schedule_year: filterParams.schedule_year ? Number(filterParams.schedule_year) : undefined,
     schedule_month: Array.isArray(filterParams.schedule_month)
       ? filterParams.schedule_month[0]
@@ -321,6 +437,8 @@ export const getLookupValues = async (
     sort: undefined
   };
 
+  const specialtyScope = filters.specialty ? SPECIALTY_SCOPES[filters.specialty] : undefined;
+
   if (filters.schedule_year) {
     values.push(filters.schedule_year);
     whereClauses.push(`schedule_year = $${values.length}`);
@@ -329,6 +447,11 @@ export const getLookupValues = async (
   if (filters.schedule_month) {
     values.push(filters.schedule_month);
     whereClauses.push(`schedule_month = $${values.length}`);
+  }
+
+  if (specialtyScope) {
+    values.push(specialtyScope.indications);
+    whereClauses.push(`indication = ANY($${values.length})`);
   }
 
   const maybeAppend = (field: keyof CombinationFilters, filterValues?: string[]) => {

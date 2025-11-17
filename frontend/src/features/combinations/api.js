@@ -6,6 +6,7 @@ const stringifyList = (value) => {
 };
 export const fetchCombinations = async (query) => {
     const params = {
+        specialty: query.specialty,
         schedule_year: query.schedule_year,
         schedule_month: query.schedule_month,
         drug: stringifyList(query.drug),

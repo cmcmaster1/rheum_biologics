@@ -15,10 +15,12 @@ export const FiltersPanel = () => {
     const treatmentPhase = useSearchStore((state) => state.treatmentPhase);
     const hospitalType = useSearchStore((state) => state.hospitalType);
     const pbsCode = useSearchStore((state) => state.pbsCode);
+    const specialty = useSearchStore((state) => state.specialty);
     const setFilter = useSearchStore((state) => state.setFilter);
     const resetFilters = useSearchStore((state) => state.resetFilters);
     const buildLookupParams = useCallback((exclude) => {
         const params = {};
+        params.specialty = specialty;
         if (scheduleYear)
             params.schedule_year = scheduleYear;
         if (scheduleMonth)
@@ -38,7 +40,7 @@ export const FiltersPanel = () => {
         if (exclude !== 'pbsCode' && pbsCode.length)
             params.pbs_code = pbsCode.join(',');
         return params;
-    }, [brand, drug, formulation, hospitalType, indication, scheduleMonth, scheduleYear, treatmentPhase, pbsCode]);
+    }, [brand, drug, formulation, hospitalType, indication, scheduleMonth, scheduleYear, treatmentPhase, pbsCode, specialty]);
     const drugsParams = useMemo(() => buildLookupParams('drug'), [buildLookupParams]);
     const brandsParams = useMemo(() => buildLookupParams('brand'), [buildLookupParams]);
     const indicationsParams = useMemo(() => buildLookupParams('indication'), [buildLookupParams]);
