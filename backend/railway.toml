@@ -4,9 +4,9 @@
 [build]
 builder = "dockerfile"
 dockerfilePath = "Dockerfile"
+watchPatterns = ["src/**", "package.json", "Dockerfile"]
 
 [deploy]
 startCommand = "npm start"
-
-[variables]
-NIXPACKS_NO_DEFAULT_CACHE_DIRS = "true"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

@@ -1,12 +1,6 @@
-# Ignore everything from parent directory
-../*
-
-# Only allow backend files
-!package.json
-!package-lock.json
-!tsconfig.json
-!src/
-!dist/
-!railway.toml
-!nixpacks.toml
-!Dockerfile
+# Backend Railway ignore
+node_modules/
+dist/
+*.log
+.env
+.DS_Store
