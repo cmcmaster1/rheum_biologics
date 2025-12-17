@@ -67,9 +67,12 @@ PORT=3001
 NODE_ENV=production
 CORS_ORIGIN=https://your-frontend-domain.railway.app
 BIOLOGICS_INGEST_ENABLED=true
-BIOLOGICS_INGEST_CRON=0 4 1 * *
+# Runs at 4 AM Sydney time on days 1, 3, 5, 7, and 15 to catch PBS data publication
+BIOLOGICS_INGEST_CRON=0 4 1,3,5,7,15 * *
 BIOLOGICS_INGEST_TZ=Australia/Sydney
 BIOLOGICS_INGEST_LOOKBACK=3
+# Enable email notifications for ingestion success/failure (requires SMTP config)
+INGESTION_EMAIL_NOTIFY=true
 # Note: No external API tokens required - data is sourced directly from PBS website
 ```
 

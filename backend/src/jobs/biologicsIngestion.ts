@@ -126,10 +126,18 @@ const matchRheumaticIndication = (condition: string | null | undefined): string 
   return null;
 };
 
-const getDownloadUrl = (date: Date): string => {
+/**
+ * Get possible download URLs for a given date.
+ * PBS changed their filename format around late 2025:
+ * - New format: 2025-12-01-PBS-API-CSV.zip
+ * - Old format: 2025-12-01-PBS-API-CSV-files.zip
+ */
+const getDownloadUrls = (date: Date): string[] => {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  return `https://www.pbs.gov.au/downloads/${year}/${month}/${year}-${month}-01-PBS-API-CSV-files.zip`;
+  const base = `https://www.pbs.gov.au/downloads/${year}/${month}/${year}-${month}-01-PBS-API-CSV`;
+  // Try new format first, then fall back to old format
+  return [`${base}.zip`, `${base}-files.zip`];
 };
 
 const resolveScheduleToDownload = async (
@@ -140,15 +148,18 @@ const resolveScheduleToDownload = async (
 
   for (let offset = 0; offset < lookbackMonths; offset += 1) {
     const candidate = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() - offset, 1));
-    const url = getDownloadUrl(candidate);
+    const urls = getDownloadUrls(candidate);
 
-    try {
-      const response = await fetch(url, { method: 'HEAD' });
-      if (response.ok) {
-        return { date: candidate, url };
+    // Try each URL format for this month
+    for (const url of urls) {
+      try {
+        const response = await fetch(url, { method: 'HEAD' });
+        if (response.ok) {
+          return { date: candidate, url };
+        }
+      } catch (error) {
+        console.warn(`Failed to reach PBS download for ${url}:`, error);
       }
-    } catch (error) {
-      console.warn(`Failed to reach PBS download for ${url}:`, error);
     }
   }
 
