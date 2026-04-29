@@ -10,9 +10,12 @@ import {
   Stack,
   Typography
 } from '@mui/material';
+import { useEffect, useMemo, useRef } from 'react';
 
+import { trackAnalyticsEvent } from '../../../api/analytics';
 import { useSearchStore } from '../../../store/searchStore';
 import { getARALink, hasARALink } from '../../../utils/araLinks';
+import type { CombinationQuery } from '../api';
 import { useCombinationSearch } from '../hooks/useCombinationSearch';
 
 const ResultCard = ({
@@ -28,7 +31,8 @@ const ResultCard = ({
   onlineApplication,
   maximumQuantity,
   maximumPack,
-  repeats
+  repeats,
+  onOutboundClick
 }: {
   drug: string;
   brand: string;
@@ -43,6 +47,7 @@ const ResultCard = ({
   maximumQuantity: number | null;
   maximumPack: number | null;
   repeats: number | null;
+  onOutboundClick: (destination: 'ara' | 'pbs') => void;
 }) => (
   <Card variant="outlined" sx={{ 
     height: '100%',
@@ -74,6 +79,7 @@ const ResultCard = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   underline="hover"
+                  onClick={() => onOutboundClick('ara')}
                   sx={{ 
                     fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     color: 'primary.main',
@@ -95,6 +101,7 @@ const ResultCard = ({
               target="_blank"
               rel="noopener noreferrer"
               underline="hover"
+              onClick={() => onOutboundClick('pbs')}
             >
               PBS {pbsCode}
             </Link>
@@ -147,10 +154,78 @@ const maximumPackageText = (pack: number | null, units: number | null) => {
 };
 
 export const SearchResults = () => {
-  const { data, isLoading, isError, error } = useCombinationSearch();
+  const { data, isLoading, isError, error, queryParams } = useCombinationSearch();
   const page = useSearchStore((state) => state.page);
   const limit = useSearchStore((state) => state.limit);
   const setPage = useSearchStore((state) => state.setPage);
+  const lastSearchEventKey = useRef<string | null>(null);
+  const searchAnalyticsPayload = useMemo(
+    () => buildSearchAnalyticsPayload(queryParams),
+    [queryParams]
+  );
+
+  useEffect(() => {
+    if (!data || isLoading || isError) {
+      return;
+    }
+
+    const eventKey = JSON.stringify({
+      queryParams,
+      total: data.meta.total
+    });
+
+    if (lastSearchEventKey.current === eventKey) {
+      return;
+    }
+
+    lastSearchEventKey.current = eventKey;
+    trackAnalyticsEvent({
+      eventName: 'search_results',
+      payload: {
+        ...searchAnalyticsPayload,
+        visibleResults: data.data.length,
+        totalResults: data.meta.total,
+        page
+      }
+    });
+  }, [data, isError, isLoading, page, queryParams, searchAnalyticsPayload]);
+
+  const handlePageChange = (value: number) => {
+    trackAnalyticsEvent({
+      eventName: 'pagination_changed',
+      payload: {
+        fromPage: page,
+        toPage: value,
+        ...searchAnalyticsPayload
+      }
+    });
+    setPage(value);
+  };
+
+  const handleOutboundClick = (
+    destination: 'ara' | 'pbs',
+    combination: {
+      drug: string;
+      brand: string;
+      pbs_code: string;
+      indication: string;
+      schedule_month: string;
+      schedule_year: number;
+    }
+  ) => {
+    trackAnalyticsEvent({
+      eventName: 'outbound_link_click',
+      payload: {
+        destination,
+        drug: combination.drug,
+        brand: combination.brand,
+        pbsCode: combination.pbs_code,
+        indication: combination.indication,
+        scheduleMonth: combination.schedule_month,
+        scheduleYear: combination.schedule_year
+      }
+    });
+  };
 
   if (isLoading) {
     return (
@@ -204,6 +279,7 @@ export const SearchResults = () => {
               maximumQuantity={combination.maximum_quantity_units}
               maximumPack={combination.maximum_prescribable_pack}
               repeats={combination.number_of_repeats}
+              onOutboundClick={(destination) => handleOutboundClick(destination, combination)}
             />
           </Grid>
         ))}
@@ -214,7 +290,7 @@ export const SearchResults = () => {
             count={totalPages}
             color="primary"
             page={page}
-            onChange={(_event, value) => setPage(value)}
+            onChange={(_event, value) => handlePageChange(value)}
             showFirstButton
             showLastButton
           />
@@ -222,4 +298,33 @@ export const SearchResults = () => {
       )}
     </Stack>
   );
+};
+
+const buildSearchAnalyticsPayload = (queryParams: CombinationQuery) => {
+  const filters = {
+    scheduleYear: queryParams.schedule_year,
+    scheduleMonth: queryParams.schedule_month,
+    drug: queryParams.drug ?? [],
+    brand: queryParams.brand ?? [],
+    formulation: queryParams.formulation ?? [],
+    indication: queryParams.indication ?? [],
+    treatmentPhase: queryParams.treatment_phase ?? [],
+    hospitalType: queryParams.hospital_type ?? [],
+    pbsCode: queryParams.pbs_code ?? []
+  };
+
+  const activeFilterCount = Object.values(filters).filter((value) => {
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+
+    return value !== undefined && value !== '';
+  }).length;
+
+  return {
+    activeFilterCount,
+    filters,
+    limit: queryParams.limit,
+    offset: queryParams.offset
+  };
 };

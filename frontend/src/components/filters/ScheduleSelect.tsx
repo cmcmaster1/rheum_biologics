@@ -1,6 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { useEffect } from 'react';
 
+import { trackAnalyticsEvent } from '../../api/analytics';
 import { useSchedules } from '../../hooks/useSchedules';
 import { useSearchStore } from '../../store/searchStore';
 
@@ -30,6 +31,13 @@ export const ScheduleSelect = () => {
   const handleChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
     const [yearPart, monthPart] = value.split('|');
+    trackAnalyticsEvent({
+      eventName: 'schedule_changed',
+      payload: {
+        scheduleYear: Number(yearPart),
+        scheduleMonth: monthPart
+      }
+    });
     setFilter('scheduleYear', Number(yearPart));
     setFilter('scheduleMonth', monthPart);
   };

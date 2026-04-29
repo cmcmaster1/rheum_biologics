@@ -1,5 +1,5 @@
 # ---------- Build stage ----------
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 # Install all deps (including dev) for building TypeScript
@@ -9,7 +9,7 @@ COPY . .
 RUN npm run build
 
 # ---------- Runtime stage ----------
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 ENV NODE_ENV=production
 WORKDIR /app
 COPY package*.json ./

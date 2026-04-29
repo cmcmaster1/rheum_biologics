@@ -114,10 +114,10 @@ export async function sendIngestionNotification(result: IngestionResult) {
       `Error: ${result.error || 'Unknown error'}`,
       `Timestamp: ${timestamp}`,
       '',
-      'Please check the Railway logs and investigate.',
+      'Please check the application logs and investigate.',
       '',
       'Manual ingestion can be triggered via:',
-      '  POST https://backend-production-564e.up.railway.app/api/ingest'
+      '  POST https://<site-domain>/api/ingest'
     ].join('\n');
   }
 

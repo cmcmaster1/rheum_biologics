@@ -9,7 +9,8 @@
     "start": "node --enable-source-maps dist/index.js",
     "lint": "eslint --ext .ts src",
     "test": "vitest",
-    "ingest:run": "tsx src/jobs/runIngestionOnce.ts"
+    "ingest:run": "tsx src/jobs/runIngestionOnce.ts",
+    "ingest:run:prod": "node --enable-source-maps dist/jobs/runIngestionOnce.js"
   },
   "dependencies": {
     "@octokit/rest": "^22.0.0",

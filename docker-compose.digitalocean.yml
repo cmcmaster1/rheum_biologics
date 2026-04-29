@@ -1,0 +1,77 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rheum_biologics}
+      POSTGRES_USER: ${POSTGRES_USER:-rheum}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-rheum}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-rheum_biologics}
+      PORT: 3001
+      NODE_ENV: production
+      CORS_ORIGIN: https://${SITE_DOMAIN}
+      BIOLOGICS_INGEST_ENABLED: ${BIOLOGICS_INGEST_ENABLED:-true}
+      BIOLOGICS_INGEST_CRON: ${BIOLOGICS_INGEST_CRON:-0 4 1,3,5,7,15 * *}
+      BIOLOGICS_INGEST_TZ: ${BIOLOGICS_INGEST_TZ:-Australia/Sydney}
+      BIOLOGICS_INGEST_LOOKBACK: ${BIOLOGICS_INGEST_LOOKBACK:-3}
+      INGESTION_EMAIL_NOTIFY: ${INGESTION_EMAIL_NOTIFY:-true}
+      ANALYTICS_ENABLED: ${ANALYTICS_ENABLED:-true}
+      ANALYTICS_SALT: ${ANALYTICS_SALT}
+      ANALYTICS_ADMIN_TOKEN: ${ANALYTICS_ADMIN_TOKEN}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      MAIL_TO: ${MAIL_TO:-}
+      GITHUB_OWNER: ${GITHUB_OWNER:-cmcmaster1}
+      GITHUB_REPO: ${GITHUB_REPO:-rheum_biologics}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: /api
+    restart: unless-stopped
+    environment:
+      PORT: 80
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

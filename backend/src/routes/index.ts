@@ -4,6 +4,7 @@ import { combinationsRouter } from './combinations.js';
 import { lookupsRouter } from './lookups.js';
 import { schedulesRouter } from './schedules.js';
 import { feedbackRouter } from './feedback.js';
+import { analyticsRouter } from './analytics.js';
 import { runBiologicsIngestion } from '../jobs/biologicsIngestion.js';
 import { getSchedulerStatus } from '../jobs/scheduler.js';
 
@@ -12,6 +13,7 @@ const router = Router();
 router.use('/combinations', combinationsRouter);
 router.use('/schedules', schedulesRouter);
 router.use('/feedback', feedbackRouter);
+router.use('/analytics', analyticsRouter);
 router.use('/', lookupsRouter);
 
 // Manual ingestion endpoint

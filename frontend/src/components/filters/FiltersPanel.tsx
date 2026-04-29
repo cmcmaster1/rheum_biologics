@@ -1,6 +1,7 @@
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
 import { useCallback, useMemo } from 'react';
 
+import { trackAnalyticsEvent } from '../../api/analytics';
 import { useLookupOptions } from '../../hooks/useLookupOptions';
 import type { FilterKey } from '../../store/searchStore';
 import { useSearchStore } from '../../store/searchStore';
@@ -69,6 +70,24 @@ export const FiltersPanel = () => {
   const hospitalTypesQuery = useLookupOptions('hospital-types', hospitalTypesParams);
   const pbsCodesQuery = useLookupOptions('pbs-codes', pbsCodesParams);
 
+  const handleFilterChange = (key: FilterKey, values: string[]) => {
+    trackAnalyticsEvent({
+      eventName: 'filter_changed',
+      payload: {
+        filterKey: key,
+        selectionCount: values.length,
+        valueLabel: values.join(', ') || '(cleared)',
+        values
+      }
+    });
+    setFilter(key, values);
+  };
+
+  const handleResetFilters = () => {
+    trackAnalyticsEvent({ eventName: 'filters_reset' });
+    resetFilters();
+  };
+
   return (
     <Paper elevation={0} variant="outlined" sx={{ p: 2.5 }}>
       <Stack spacing={2.5}>
@@ -88,7 +107,7 @@ export const FiltersPanel = () => {
               placeholder="All drugs"
               options={drugsQuery.data ?? []}
               value={drug}
-              onChange={(values) => setFilter('drug', values)}
+              onChange={(values) => handleFilterChange('drug', values)}
               loading={drugsQuery.isLoading}
             />
           </Stack>
@@ -101,7 +120,7 @@ export const FiltersPanel = () => {
               placeholder="All brands"
               options={brandsQuery.data ?? []}
               value={brand}
-              onChange={(values) => setFilter('brand', values)}
+              onChange={(values) => handleFilterChange('brand', values)}
               loading={brandsQuery.isLoading}
             />
           </Stack>
@@ -117,7 +136,7 @@ export const FiltersPanel = () => {
               placeholder="All indications"
               options={indicationsQuery.data ?? []}
               value={indication}
-              onChange={(values) => setFilter('indication', values)}
+              onChange={(values) => handleFilterChange('indication', values)}
               loading={indicationsQuery.isLoading}
             />
           </Stack>
@@ -130,7 +149,7 @@ export const FiltersPanel = () => {
               placeholder="All formulations"
               options={formulationsQuery.data ?? []}
               value={formulation}
-              onChange={(values) => setFilter('formulation', values)}
+              onChange={(values) => handleFilterChange('formulation', values)}
               loading={formulationsQuery.isLoading}
             />
           </Stack>
@@ -143,7 +162,7 @@ export const FiltersPanel = () => {
               placeholder="All phases"
               options={treatmentPhasesQuery.data ?? []}
               value={treatmentPhase}
-              onChange={(values) => setFilter('treatmentPhase', values)}
+              onChange={(values) => handleFilterChange('treatmentPhase', values)}
               loading={treatmentPhasesQuery.isLoading}
             />
           </Stack>
@@ -159,7 +178,7 @@ export const FiltersPanel = () => {
               placeholder="All hospital types"
               options={hospitalTypesQuery.data ?? []}
               value={hospitalType}
-              onChange={(values) => setFilter('hospitalType', values)}
+              onChange={(values) => handleFilterChange('hospitalType', values)}
               loading={hospitalTypesQuery.isLoading}
             />
           </Stack>
@@ -172,7 +191,7 @@ export const FiltersPanel = () => {
               placeholder="All PBS codes"
               options={pbsCodesQuery.data ?? []}
               value={pbsCode}
-              onChange={(values) => setFilter('pbsCode', values)}
+              onChange={(values) => handleFilterChange('pbsCode', values)}
               loading={pbsCodesQuery.isLoading}
             />
           </Stack>
@@ -181,7 +200,7 @@ export const FiltersPanel = () => {
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="flex-end">
           <Box flex={1} />
           <Divider flexItem orientation="vertical" sx={{ display: { xs: 'none', md: 'block' } }} />
-          <Button variant="text" onClick={resetFilters} sx={{ alignSelf: { xs: 'stretch', md: 'center' } }}>
+          <Button variant="text" onClick={handleResetFilters} sx={{ alignSelf: { xs: 'stretch', md: 'center' } }}>
             Reset filters
           </Button>
         </Stack>

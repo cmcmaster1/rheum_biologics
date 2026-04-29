@@ -1,13 +1,22 @@
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import { trackAnalyticsEvent } from './api/analytics';
 import { DarkModeToggle } from './components/DarkModeToggle';
 import { FeedbackDialog } from './components/FeedbackDialog';
 import { FiltersPanel } from './components/filters/FiltersPanel';
 import { SearchResults } from './features/combinations/components/SearchResults';
+import { useAnalyticsPageView } from './hooks/useAnalyticsPageView';
 
 const App = () => {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  useAnalyticsPageView();
+
+  const handleFeedbackOpen = () => {
+    trackAnalyticsEvent({ eventName: 'feedback_opened' });
+    setFeedbackOpen(true);
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
       <Container maxWidth="lg" sx={{ py: 4, px: { xs: 2, sm: 3 } }}>
@@ -40,7 +49,7 @@ const App = () => {
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
               <DarkModeToggle />
-              <Button variant="outlined" size="small" onClick={() => setFeedbackOpen(true)}>
+              <Button variant="outlined" size="small" onClick={handleFeedbackOpen}>
                 Send Feedback
               </Button>
             </Stack>

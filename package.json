@@ -16,7 +16,7 @@
     "build:frontend": "cd frontend && npm run build",
     "start": "cd backend && npm start",
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
-    "deploy": "./deploy.sh"
+    "deploy": "docker compose --env-file .env -f docker-compose.digitalocean.yml up -d --build"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
