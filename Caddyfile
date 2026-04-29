@@ -2,7 +2,7 @@
 	email {$ACME_EMAIL}
 }
 
-{$SITE_DOMAIN} {
+(common_handlers) {
 	encode zstd gzip
 
 	handle /api/* {
@@ -16,4 +16,12 @@
 	handle {
 		reverse_proxy frontend:80
 	}
+}
+
+{$SITE_DOMAIN} {
+	import common_handlers
+}
+
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
 }

@@ -62,6 +62,7 @@ Set long random values for `POSTGRES_PASSWORD`, `ANALYTICS_SALT`, and
 analytics from `/api/analytics/summary`.
 
 Make sure DNS for `SITE_DOMAIN` points to the Droplet IPv4 address before starting Caddy.
+For `www`, either add a CNAME to the apex domain or an A record to the same Droplet IPv4 address.
 
 Start the stack:
 
