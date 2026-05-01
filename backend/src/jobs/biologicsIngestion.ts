@@ -36,14 +36,24 @@ const BIOLOGICS = [
 ];
 
 const RHEUMATIC_DISEASES = [
-  'rheumatoid arthritis',
-  'psoriatic arthritis',
-  'ankylosing spondylitis',
-  'non-radiographic axial spondyloarthritis',
-  'giant cell arteritis',
-  'juvenile idiopathic arthritis',
-  'systemic lupus erythematosus',
-  'anti-neutrophil cytoplasmic autoantibody (anca) associated vasculitis'
+  {
+    match: 'enthesitis/spondylitis related juvenile idiopathic arthritis',
+    label: 'JIA Spondylitis'
+  },
+  { match: 'rheumatoid arthritis', label: 'Rheumatoid Arthritis' },
+  { match: 'psoriatic arthritis', label: 'Psoriatic Arthritis' },
+  { match: 'ankylosing spondylitis', label: 'Ankylosing Spondylitis' },
+  {
+    match: 'non-radiographic axial spondyloarthritis',
+    label: 'Non-radiographic Axial Spondyloarthritis'
+  },
+  { match: 'giant cell arteritis', label: 'Giant Cell Arteritis' },
+  { match: 'juvenile idiopathic arthritis', label: 'Juvenile Idiopathic Arthritis' },
+  { match: 'systemic lupus erythematosus', label: 'Systemic Lupus Erythematosus' },
+  {
+    match: 'anti-neutrophil cytoplasmic autoantibody (anca) associated vasculitis',
+    label: 'Anti-neutrophil Cytoplasmic Autoantibody (anca) Associated Vasculitis'
+  }
 ];
 
 type CsvRow = Record<string, string | null>;
@@ -116,11 +126,8 @@ const matchRheumaticIndication = (condition: string | null | undefined): string 
   if (!condition) return null;
   const lowered = condition.toLowerCase();
   for (const disease of RHEUMATIC_DISEASES) {
-    if (lowered.includes(disease)) {
-      return disease
-        .split(' ')
-        .map((word) => (word.length > 0 ? word[0].toUpperCase() + word.slice(1) : word))
-        .join(' ');
+    if (lowered.includes(disease.match)) {
+      return disease.label;
     }
   }
   return null;
