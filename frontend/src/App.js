@@ -1,5 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { Box, Button, Container, Stack, Typography } from '@mui/material';
+import { Box, Button, Container, Link, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { trackAnalyticsEvent } from './api/analytics';
@@ -26,7 +26,7 @@ const LookupPage = () => {
                                             textAlign: 'center',
                                             width: { xs: '100%', sm: 'auto' },
                                             minWidth: { xs: 'auto', sm: '300px' }
-                                        }, children: "We're looking for a sponsor. Email admin@rheumai.com to advertise in this space" })] }), _jsxs(Stack, { direction: "row", spacing: 1, alignItems: "center", children: [_jsx(DarkModeToggle, {}), _jsx(Button, { variant: "outlined", size: "small", onClick: handleFeedbackOpen, children: "Send Feedback" })] })] }), _jsx(FiltersPanel, {}), _jsx(SearchResults, {}), _jsx(FeedbackDialog, { open: feedbackOpen, onClose: () => setFeedbackOpen(false) })] }) }) }));
+                                        }, children: "We're looking for a sponsor. Email admin@rheumai.com to advertise in this space" })] }), _jsxs(Stack, { spacing: 0.75, alignItems: "flex-start", children: [_jsxs(Stack, { direction: "row", spacing: 1, alignItems: "center", children: [_jsx(DarkModeToggle, {}), _jsx(Button, { variant: "outlined", size: "small", onClick: handleFeedbackOpen, children: "Send Feedback" })] }), _jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Please bookmark the new address", ' ', _jsx(Link, { href: "https://www.rheumbiologics.com/", underline: "hover", children: "www.rheumbiologics.com" })] })] })] }), _jsx(FiltersPanel, {}), _jsx(SearchResults, {}), _jsx(FeedbackDialog, { open: feedbackOpen, onClose: () => setFeedbackOpen(false) })] }) }) }));
 };
 const App = () => (_jsxs(Routes, { children: [_jsx(Route, { path: "/dashboard", element: _jsx(DashboardPage, {}) }), _jsx(Route, { path: "*", element: _jsx(LookupPage, {}) })] }));
 export default App;

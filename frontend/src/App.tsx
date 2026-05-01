@@ -1,4 +1,4 @@
-import { Box, Button, Container, Stack, Typography } from '@mui/material';
+import { Box, Button, Container, Link, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
@@ -49,11 +49,19 @@ const LookupPage = () => {
                 We&apos;re looking for a sponsor. Email admin@rheumai.com to advertise in this space
               </Box>
             </Stack>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <DarkModeToggle />
-              <Button variant="outlined" size="small" onClick={handleFeedbackOpen}>
-                Send Feedback
-              </Button>
+            <Stack spacing={0.75} alignItems="flex-start">
+              <Stack direction="row" spacing={1} alignItems="center">
+                <DarkModeToggle />
+                <Button variant="outlined" size="small" onClick={handleFeedbackOpen}>
+                  Send Feedback
+                </Button>
+              </Stack>
+              <Typography variant="body2" color="text.secondary">
+                Please bookmark the new address{' '}
+                <Link href="https://www.rheumbiologics.com/" underline="hover">
+                  www.rheumbiologics.com
+                </Link>
+              </Typography>
             </Stack>
           </Stack>
 
