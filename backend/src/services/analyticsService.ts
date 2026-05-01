@@ -205,6 +205,101 @@ export const getAnalyticsSummary = async (days: number, eventName?: string) => {
     params
   );
 
+  const sessionJourneys = await query(
+    `
+      WITH filtered_events AS (
+        SELECT
+          id,
+          created_at,
+          event_name,
+          session_id,
+          visitor_hash,
+          path,
+          payload
+        FROM analytics_events
+        WHERE
+          created_at >= NOW() - ($1::int * INTERVAL '1 day')
+          ${eventFilter}
+          AND session_id IS NOT NULL
+      ),
+      selected_sessions AS (
+        SELECT
+          session_id,
+          LEFT(COALESCE(MAX(visitor_hash), ''), 12) AS visitor_key,
+          MIN(created_at) AS first_seen,
+          MAX(created_at) AS last_seen,
+          COUNT(*)::int AS events,
+          COUNT(*) FILTER (WHERE event_name = 'search_results')::int AS searches,
+          COUNT(*) FILTER (WHERE event_name = 'filter_changed')::int AS filters,
+          COUNT(*) FILTER (WHERE event_name = 'outbound_link_click')::int AS outbound_clicks,
+          COUNT(*) FILTER (WHERE event_name = 'feedback_opened')::int AS feedback_opens
+        FROM filtered_events
+        GROUP BY session_id
+        ORDER BY MAX(created_at) DESC
+        LIMIT 50
+      )
+      SELECT
+        selected_sessions.session_id::text,
+        selected_sessions.visitor_key,
+        selected_sessions.first_seen,
+        selected_sessions.last_seen,
+        selected_sessions.events,
+        selected_sessions.searches,
+        selected_sessions.filters,
+        selected_sessions.outbound_clicks,
+        selected_sessions.feedback_opens,
+        JSONB_AGG(
+          JSONB_BUILD_OBJECT(
+            'created_at', filtered_events.created_at,
+            'event_name', filtered_events.event_name,
+            'path', filtered_events.path,
+            'payload', filtered_events.payload
+          )
+          ORDER BY filtered_events.created_at ASC, filtered_events.id ASC
+        ) AS timeline
+      FROM selected_sessions
+      JOIN filtered_events ON filtered_events.session_id = selected_sessions.session_id
+      GROUP BY
+        selected_sessions.session_id,
+        selected_sessions.visitor_key,
+        selected_sessions.first_seen,
+        selected_sessions.last_seen,
+        selected_sessions.events,
+        selected_sessions.searches,
+        selected_sessions.filters,
+        selected_sessions.outbound_clicks,
+        selected_sessions.feedback_opens
+      ORDER BY selected_sessions.last_seen DESC
+    `,
+    params
+  );
+
+  const topSequences = await query(
+    `
+      WITH session_sequences AS (
+        SELECT
+          session_id,
+          STRING_AGG(event_name, ' -> ' ORDER BY created_at ASC, id ASC) AS sequence,
+          COUNT(*) FILTER (WHERE event_name = 'outbound_link_click') > 0 AS converted
+        FROM analytics_events
+        WHERE
+          created_at >= NOW() - ($1::int * INTERVAL '1 day')
+          ${eventFilter}
+          AND session_id IS NOT NULL
+        GROUP BY session_id
+      )
+      SELECT
+        sequence,
+        COUNT(*)::int AS sessions,
+        COUNT(*) FILTER (WHERE converted)::int AS sessions_with_click
+      FROM session_sequences
+      GROUP BY sequence
+      ORDER BY sessions DESC, sessions_with_click DESC
+      LIMIT 25
+    `,
+    params
+  );
+
   return {
     days: boundedDays,
     eventName: eventName ?? null,
@@ -215,7 +310,9 @@ export const getAnalyticsSummary = async (days: number, eventName?: string) => {
     topTimezones: topTimezones.rows,
     topFilters: topFilters.rows,
     topDrugs: topDrugs.rows,
-    resultDistribution: resultDistribution.rows
+    resultDistribution: resultDistribution.rows,
+    sessionJourneys: sessionJourneys.rows,
+    topSequences: topSequences.rows
   };
 };
 

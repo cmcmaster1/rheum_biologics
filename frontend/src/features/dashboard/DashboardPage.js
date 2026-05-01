@@ -1,5 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { Alert, Box, Button, Container, FormControl, InputLabel, LinearProgress, MenuItem, Paper, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Alert, Accordion, AccordionDetails, AccordionSummary, Box, Button, Container, FormControl, InputLabel, LinearProgress, MenuItem, Paper, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { dashboardCsvUrl, getDashboardAnalytics, getDashboardMe, getDashboardStatus, loginDashboard, logoutDashboard, setupDashboard } from '../../api/dashboard';
@@ -93,6 +93,10 @@ const DashboardAnalytics = ({ summary }) => {
                     ['events', 'Events'],
                     ['sessions', 'Sessions'],
                     ['visitors', 'Devices']
+                ] }), _jsx(SessionJourneys, { journeys: summary.sessionJourneys }), _jsx(DataTable, { title: "Top Event Sequences", rows: summary.topSequences, columns: [
+                    ['sequence', 'Sequence'],
+                    ['sessions', 'Sessions'],
+                    ['sessions_with_click', 'Sessions with click']
                 ] }), _jsx(DataTable, { title: "Top Filters", rows: summary.topFilters, columns: [
                     ['filter_key', 'Filter'],
                     ['value_label', 'Value'],
@@ -112,6 +116,15 @@ const DashboardAnalytics = ({ summary }) => {
                     ['visitors', 'Devices']
                 ] })] }));
 };
+const SessionJourneys = ({ journeys }) => (_jsxs(Paper, { variant: "outlined", sx: { borderRadius: 1, overflow: 'hidden' }, children: [_jsxs(Box, { sx: { p: 2 }, children: [_jsx(Typography, { variant: "h6", fontWeight: 700, children: "Session Journeys" }), _jsx(Typography, { variant: "body2", color: "text.secondary", children: "Recent anonymous sessions, ordered by latest activity." })] }), journeys.length === 0 && (_jsx(Box, { sx: { px: 2, pb: 2 }, children: _jsx(Typography, { color: "text.secondary", children: "No sessions for this filter." }) })), journeys.map((journey) => (_jsxs(Accordion, { disableGutters: true, children: [_jsx(AccordionSummary, { children: _jsxs(Stack, { direction: { xs: 'column', md: 'row' }, spacing: 1, sx: { width: '100%' }, justifyContent: "space-between", children: [_jsxs(Box, { children: [_jsxs(Typography, { fontWeight: 700, children: [formatDateTime(journey.first_seen), " - ", journey.events, " events"] }), _jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Device ", journey.visitor_key || 'unknown', " \u00B7 Session", ' ', journey.session_id.slice(0, 8)] })] }), _jsxs(Typography, { variant: "body2", color: "text.secondary", children: [journey.filters, " filters \u00B7 ", journey.searches, " searches \u00B7", ' ', journey.outbound_clicks, " clicks"] })] }) }), _jsx(AccordionDetails, { children: _jsx(Stack, { spacing: 1.25, children: journey.timeline.map((event, index) => (_jsxs(Box, { sx: {
+                                display: 'grid',
+                                gridTemplateColumns: { xs: '1fr', md: '130px 190px 1fr' },
+                                gap: 1,
+                                alignItems: 'start',
+                                borderLeft: 3,
+                                borderColor: event.event_name === 'outbound_link_click' ? 'success.main' : 'divider',
+                                pl: 1.5
+                            }, children: [_jsx(Typography, { variant: "body2", color: "text.secondary", children: formatTime(event.created_at) }), _jsx(Typography, { variant: "body2", fontWeight: 700, children: event.event_name }), _jsx(Typography, { variant: "body2", children: describeJourneyEvent(event) })] }, `${event.created_at}-${index}`))) }) })] }, journey.session_id)))] }));
 const Metric = ({ label, value }) => (_jsxs(Paper, { variant: "outlined", sx: { p: 2, borderRadius: 1 }, children: [_jsx(Typography, { variant: "body2", color: "text.secondary", children: label }), _jsx(Typography, { variant: "h4", fontWeight: 700, children: typeof value === 'number' ? value.toLocaleString() : value })] }));
 const DataTable = ({ title, rows, columns }) => {
     const visibleRows = useMemo(() => rows.slice(0, 50), [rows]);
@@ -123,6 +136,39 @@ const formatDate = (date) => new Intl.DateTimeFormat('en-AU', {
     month: 'short',
     year: 'numeric'
 }).format(new Date(date));
+const formatDateTime = (date) => new Intl.DateTimeFormat('en-AU', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+}).format(new Date(date));
+const formatTime = (date) => new Intl.DateTimeFormat('en-AU', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+}).format(new Date(date));
+const describeJourneyEvent = (event) => {
+    const payload = event.payload ?? {};
+    if (event.event_name === 'filter_changed') {
+        return `${formatCell(payload.filterKey)} = ${formatCell(payload.valueLabel)}`;
+    }
+    if (event.event_name === 'search_results') {
+        return `${formatCell(payload.totalResults)} results`;
+    }
+    if (event.event_name === 'outbound_link_click') {
+        const parts = [payload.drug, payload.brand, payload.pbsCode]
+            .map(formatCell)
+            .filter((part) => part !== '-');
+        return parts.length > 0 ? parts.join(' · ') : 'Outbound link';
+    }
+    if (event.event_name === 'page_view') {
+        return `${formatCell(payload.title)} ${event.path ? `(${event.path})` : ''}`;
+    }
+    if (event.event_name === 'pagination_changed') {
+        return `Page ${formatCell(payload.page)}`;
+    }
+    return event.path || '-';
+};
 const formatCell = (value) => {
     if (value === null || value === undefined || value === '') {
         return '-';

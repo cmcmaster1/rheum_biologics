@@ -1,5 +1,8 @@
 import {
   Alert,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Button,
   Container,
@@ -23,6 +26,7 @@ import { FormEvent, useMemo, useState } from 'react';
 
 import {
   AnalyticsSummary,
+  SessionJourney,
   dashboardCsvUrl,
   getDashboardAnalytics,
   getDashboardMe,
@@ -300,6 +304,16 @@ const DashboardAnalytics = ({ summary }: { summary: AnalyticsSummary }) => {
           ['visitors', 'Devices']
         ]}
       />
+      <SessionJourneys journeys={summary.sessionJourneys} />
+      <DataTable
+        title="Top Event Sequences"
+        rows={summary.topSequences}
+        columns={[
+          ['sequence', 'Sequence'],
+          ['sessions', 'Sessions'],
+          ['sessions_with_click', 'Sessions with click']
+        ]}
+      />
       <DataTable
         title="Top Filters"
         rows={summary.topFilters}
@@ -340,6 +354,76 @@ const DashboardAnalytics = ({ summary }: { summary: AnalyticsSummary }) => {
     </Stack>
   );
 };
+
+const SessionJourneys = ({ journeys }: { journeys: SessionJourney[] }) => (
+  <Paper variant="outlined" sx={{ borderRadius: 1, overflow: 'hidden' }}>
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h6" fontWeight={700}>
+        Session Journeys
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        Recent anonymous sessions, ordered by latest activity.
+      </Typography>
+    </Box>
+    {journeys.length === 0 && (
+      <Box sx={{ px: 2, pb: 2 }}>
+        <Typography color="text.secondary">No sessions for this filter.</Typography>
+      </Box>
+    )}
+    {journeys.map((journey) => (
+      <Accordion key={journey.session_id} disableGutters>
+        <AccordionSummary>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={1}
+            sx={{ width: '100%' }}
+            justifyContent="space-between"
+          >
+            <Box>
+              <Typography fontWeight={700}>
+                {formatDateTime(journey.first_seen)} - {journey.events} events
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Device {journey.visitor_key || 'unknown'} · Session{' '}
+                {journey.session_id.slice(0, 8)}
+              </Typography>
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              {journey.filters} filters · {journey.searches} searches ·{' '}
+              {journey.outbound_clicks} clicks
+            </Typography>
+          </Stack>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Stack spacing={1.25}>
+            {journey.timeline.map((event, index) => (
+              <Box
+                key={`${event.created_at}-${index}`}
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', md: '130px 190px 1fr' },
+                  gap: 1,
+                  alignItems: 'start',
+                  borderLeft: 3,
+                  borderColor: event.event_name === 'outbound_link_click' ? 'success.main' : 'divider',
+                  pl: 1.5
+                }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  {formatTime(event.created_at)}
+                </Typography>
+                <Typography variant="body2" fontWeight={700}>
+                  {event.event_name}
+                </Typography>
+                <Typography variant="body2">{describeJourneyEvent(event)}</Typography>
+              </Box>
+            ))}
+          </Stack>
+        </AccordionDetails>
+      </Accordion>
+    ))}
+  </Paper>
+);
 
 const Metric = ({ label, value }: { label: string; value: number | string }) => (
   <Paper variant="outlined" sx={{ p: 2, borderRadius: 1 }}>
@@ -413,6 +497,50 @@ const formatDate = (date: string) =>
     month: 'short',
     year: 'numeric'
   }).format(new Date(date));
+
+const formatDateTime = (date: string) =>
+  new Intl.DateTimeFormat('en-AU', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(new Date(date));
+
+const formatTime = (date: string) =>
+  new Intl.DateTimeFormat('en-AU', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  }).format(new Date(date));
+
+const describeJourneyEvent = (event: SessionJourney['timeline'][number]) => {
+  const payload = event.payload ?? {};
+
+  if (event.event_name === 'filter_changed') {
+    return `${formatCell(payload.filterKey)} = ${formatCell(payload.valueLabel)}`;
+  }
+
+  if (event.event_name === 'search_results') {
+    return `${formatCell(payload.totalResults)} results`;
+  }
+
+  if (event.event_name === 'outbound_link_click') {
+    const parts = [payload.drug, payload.brand, payload.pbsCode]
+      .map(formatCell)
+      .filter((part) => part !== '-');
+    return parts.length > 0 ? parts.join(' · ') : 'Outbound link';
+  }
+
+  if (event.event_name === 'page_view') {
+    return `${formatCell(payload.title)} ${event.path ? `(${event.path})` : ''}`;
+  }
+
+  if (event.event_name === 'pagination_changed') {
+    return `Page ${formatCell(payload.page)}`;
+  }
+
+  return event.path || '-';
+};
 
 const formatCell = (value: unknown) => {
   if (value === null || value === undefined || value === '') {

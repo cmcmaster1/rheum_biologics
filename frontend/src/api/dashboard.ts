@@ -58,6 +58,30 @@ export type AnalyticsSummary = {
     bucket: number;
     searches: number;
   }>;
+  sessionJourneys: Array<SessionJourney>;
+  topSequences: Array<{
+    sequence: string;
+    sessions: number;
+    sessions_with_click: number;
+  }>;
+};
+
+export type SessionJourney = {
+  session_id: string;
+  visitor_key: string;
+  first_seen: string;
+  last_seen: string;
+  events: number;
+  searches: number;
+  filters: number;
+  outbound_clicks: number;
+  feedback_opens: number;
+  timeline: Array<{
+    created_at: string;
+    event_name: string;
+    path: string | null;
+    payload: Record<string, unknown>;
+  }>;
 };
 
 export const getDashboardStatus = async () => {
