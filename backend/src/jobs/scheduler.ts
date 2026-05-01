@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 
 import { runBiologicsIngestion } from './biologicsIngestion.js';
+import { getSchedulerTargetMonthDate } from './schedulerDate.js';
 import { getSchedules } from '../services/biologicsService.js';
 import { sendIngestionNotification } from '../services/emailService.js';
 
@@ -29,22 +30,16 @@ let schedulerStatus: {
 
 export const getSchedulerStatus = () => ({ ...schedulerStatus });
 
-/**
- * Check if the current month's schedule is already ingested.
- * Returns the schedule code for the current month (e.g., "2025-12").
- */
-const getCurrentMonthScheduleCode = (): string => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
+const getScheduleCodeForDate = (date: Date): string => {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
   return `${year}-${month}`;
 };
 
-const isCurrentMonthAlreadyIngested = async (): Promise<boolean> => {
+const isScheduleAlreadyIngested = async (scheduleCode: string): Promise<boolean> => {
   try {
     const schedules = await getSchedules();
-    const currentCode = getCurrentMonthScheduleCode();
-    return schedules.some(s => s.schedule_code === currentCode);
+    return schedules.some((s) => s.schedule_code === scheduleCode);
   } catch (error) {
     console.warn('[Scheduler] Failed to check existing schedules, will attempt ingestion:', error);
     return false;
@@ -70,23 +65,26 @@ export const startSchedulers = () => {
     expression,
     async () => {
       const startedAt = new Date();
+      const targetDate = getSchedulerTargetMonthDate(startedAt, timezone);
+      const targetScheduleCode = getScheduleCodeForDate(targetDate);
       schedulerStatus.lastRun = startedAt;
       schedulerStatus.lastError = undefined;
       schedulerStatus.lastResult = undefined;
-      console.log(`[Scheduler] Starting biologics ingestion check at ${startedAt.toISOString()}`);
+      console.log(
+        `[Scheduler] Starting biologics ingestion check at ${startedAt.toISOString()} for schedule ${targetScheduleCode} (${timezone})`
+      );
 
       try {
-        // Skip if current month is already ingested
-        const alreadyIngested = await isCurrentMonthAlreadyIngested();
+        // Skip if the scheduler timezone's current month is already ingested
+        const alreadyIngested = await isScheduleAlreadyIngested(targetScheduleCode);
         if (alreadyIngested) {
-          const currentCode = getCurrentMonthScheduleCode();
-          console.log(`[Scheduler] Current month ${currentCode} already ingested, skipping.`);
-          schedulerStatus.lastResult = { schedule: currentCode, count: 0, skipped: true };
+          console.log(`[Scheduler] Schedule ${targetScheduleCode} already ingested, skipping.`);
+          schedulerStatus.lastResult = { schedule: targetScheduleCode, count: 0, skipped: true };
           // No email for skipped runs
           return;
         }
 
-        const result = await runBiologicsIngestion({ lookbackMonths });
+        const result = await runBiologicsIngestion({ lookbackMonths, targetDate });
         schedulerStatus.lastResult = { 
           schedule: result.schedule.code, 
           count: result.count,
