@@ -5,5 +5,6 @@ const baseURL = configuredBaseURL === undefined ? 'http://localhost:4000' : conf
 
 export const apiClient = axios.create({
   baseURL,
-  timeout: 10_000
+  timeout: 10_000,
+  withCredentials: true
 });

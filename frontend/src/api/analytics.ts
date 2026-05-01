@@ -2,6 +2,7 @@ import { apiClient } from './client';
 
 const SESSION_STORAGE_KEY = 'rheumai_analytics_session_id';
 const SESSION_STARTED_KEY = 'rheumai_analytics_session_started';
+const VISITOR_STORAGE_KEY = 'rheumai_analytics_visitor_id';
 
 type AnalyticsPayload = Record<string, unknown>;
 
@@ -18,6 +19,7 @@ export const trackAnalyticsEvent = ({ eventName, payload = {} }: AnalyticsEvent)
   const body = {
     eventName,
     sessionId: getSessionId(),
+    visitorId: getVisitorId(),
     path: window.location.pathname + window.location.search,
     referrer: document.referrer || undefined,
     payload: {
@@ -51,13 +53,24 @@ export const trackSessionStart = () => {
 };
 
 const getSessionId = () => {
-  const existing = localStorage.getItem(SESSION_STORAGE_KEY);
+  const existing = sessionStorage.getItem(SESSION_STORAGE_KEY);
   if (existing) {
     return existing;
   }
 
   const next = createSessionId();
-  localStorage.setItem(SESSION_STORAGE_KEY, next);
+  sessionStorage.setItem(SESSION_STORAGE_KEY, next);
+  return next;
+};
+
+const getVisitorId = () => {
+  const existing = localStorage.getItem(VISITOR_STORAGE_KEY);
+  if (existing) {
+    return existing;
+  }
+
+  const next = createSessionId();
+  localStorage.setItem(VISITOR_STORAGE_KEY, next);
   return next;
 };
 

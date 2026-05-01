@@ -1,6 +1,7 @@
 import { apiClient } from './client';
 const SESSION_STORAGE_KEY = 'rheumai_analytics_session_id';
 const SESSION_STARTED_KEY = 'rheumai_analytics_session_started';
+const VISITOR_STORAGE_KEY = 'rheumai_analytics_visitor_id';
 export const trackAnalyticsEvent = ({ eventName, payload = {} }) => {
     if (import.meta.env.VITE_ANALYTICS_ENABLED === 'false') {
         return;
@@ -8,6 +9,7 @@ export const trackAnalyticsEvent = ({ eventName, payload = {} }) => {
     const body = {
         eventName,
         sessionId: getSessionId(),
+        visitorId: getVisitorId(),
         path: window.location.pathname + window.location.search,
         referrer: document.referrer || undefined,
         payload: {
@@ -35,12 +37,21 @@ export const trackSessionStart = () => {
     trackAnalyticsEvent({ eventName: 'session_start' });
 };
 const getSessionId = () => {
-    const existing = localStorage.getItem(SESSION_STORAGE_KEY);
+    const existing = sessionStorage.getItem(SESSION_STORAGE_KEY);
     if (existing) {
         return existing;
     }
     const next = createSessionId();
-    localStorage.setItem(SESSION_STORAGE_KEY, next);
+    sessionStorage.setItem(SESSION_STORAGE_KEY, next);
+    return next;
+};
+const getVisitorId = () => {
+    const existing = localStorage.getItem(VISITOR_STORAGE_KEY);
+    if (existing) {
+        return existing;
+    }
+    const next = createSessionId();
+    localStorage.setItem(VISITOR_STORAGE_KEY, next);
     return next;
 };
 const createSessionId = () => {

@@ -12,6 +12,7 @@ const MAX_PAYLOAD_KEYS = 40;
 const analyticsEventSchema = z.object({
   eventName: z.string().min(1).max(80).regex(/^[a-z0-9_:-]+$/i),
   sessionId: z.string().uuid().optional(),
+  visitorId: z.string().min(8).max(128).optional(),
   path: z.string().max(500).optional(),
   referrer: z.string().max(500).optional(),
   payload: z.record(z.unknown()).optional()
@@ -28,7 +29,7 @@ export const recordAnalyticsEvent = async (event: AnalyticsEventInput, req: Requ
     return;
   }
 
-  const visitorHash = hashVisitor(req);
+  const visitorHash = hashVisitor(event, req);
   const userAgent = truncateString(req.get('user-agent') ?? undefined);
 
   await query(
@@ -56,9 +57,13 @@ export const recordAnalyticsEvent = async (event: AnalyticsEventInput, req: Requ
   );
 };
 
-export const getAnalyticsSummary = async (days: number) => {
+export const getAnalyticsSummary = async (days: number, eventName?: string) => {
   const boundedDays = Math.min(Math.max(days, 1), 365);
-  const params = [boundedDays];
+  const params: Array<string | number> = [boundedDays];
+  const eventFilter = eventName ? 'AND event_name = $2' : '';
+  if (eventName) {
+    params.push(eventName);
+  }
 
   const overview = await query(
     `
@@ -72,6 +77,7 @@ export const getAnalyticsSummary = async (days: number) => {
         COUNT(*) FILTER (WHERE event_name = 'feedback_opened')::int AS feedback_opens
       FROM analytics_events
       WHERE created_at >= NOW() - ($1::int * INTERVAL '1 day')
+      ${eventFilter}
     `,
     params
   );
@@ -87,8 +93,59 @@ export const getAnalyticsSummary = async (days: number) => {
         COUNT(*) FILTER (WHERE event_name = 'outbound_link_click')::int AS outbound_clicks
       FROM analytics_events
       WHERE created_at >= NOW() - ($1::int * INTERVAL '1 day')
+      ${eventFilter}
       GROUP BY 1
       ORDER BY 1 DESC
+    `,
+    params
+  );
+
+  const eventBreakdown = await query(
+    `
+      SELECT
+        event_name,
+        COUNT(*)::int AS events,
+        COUNT(DISTINCT session_id)::int AS sessions,
+        COUNT(DISTINCT visitor_hash)::int AS visitors
+      FROM analytics_events
+      WHERE created_at >= NOW() - ($1::int * INTERVAL '1 day')
+      ${eventFilter}
+      GROUP BY 1
+      ORDER BY events DESC
+    `,
+    params
+  );
+
+  const topPages = await query(
+    `
+      SELECT
+        COALESCE(path, '(unknown)') AS path,
+        COUNT(*)::int AS events,
+        COUNT(DISTINCT session_id)::int AS sessions,
+        COUNT(DISTINCT visitor_hash)::int AS visitors
+      FROM analytics_events
+      WHERE created_at >= NOW() - ($1::int * INTERVAL '1 day')
+      ${eventFilter}
+      GROUP BY 1
+      ORDER BY events DESC
+      LIMIT 50
+    `,
+    params
+  );
+
+  const topTimezones = await query(
+    `
+      SELECT
+        COALESCE(payload->>'timezone', '(unknown)') AS timezone,
+        COUNT(*)::int AS events,
+        COUNT(DISTINCT session_id)::int AS sessions,
+        COUNT(DISTINCT visitor_hash)::int AS visitors
+      FROM analytics_events
+      WHERE created_at >= NOW() - ($1::int * INTERVAL '1 day')
+      ${eventFilter}
+      GROUP BY 1
+      ORDER BY visitors DESC, events DESC
+      LIMIT 50
     `,
     params
   );
@@ -103,6 +160,7 @@ export const getAnalyticsSummary = async (days: number) => {
       WHERE
         created_at >= NOW() - ($1::int * INTERVAL '1 day')
         AND event_name = 'filter_changed'
+        ${eventName ? 'AND event_name = $2' : ''}
         AND payload ? 'filterKey'
         AND payload ? 'valueLabel'
       GROUP BY 1, 2
@@ -121,6 +179,7 @@ export const getAnalyticsSummary = async (days: number) => {
       WHERE
         created_at >= NOW() - ($1::int * INTERVAL '1 day')
         AND event_name = 'outbound_link_click'
+        ${eventName ? 'AND event_name = $2' : ''}
         AND payload ? 'drug'
       GROUP BY 1
       ORDER BY clicks DESC
@@ -138,6 +197,7 @@ export const getAnalyticsSummary = async (days: number) => {
       WHERE
         created_at >= NOW() - ($1::int * INTERVAL '1 day')
         AND event_name = 'search_results'
+        ${eventName ? 'AND event_name = $2' : ''}
         AND payload ? 'totalResults'
       GROUP BY 1
       ORDER BY 1
@@ -147,16 +207,67 @@ export const getAnalyticsSummary = async (days: number) => {
 
   return {
     days: boundedDays,
+    eventName: eventName ?? null,
     overview: overview.rows[0],
     daily: daily.rows,
+    eventBreakdown: eventBreakdown.rows,
+    topPages: topPages.rows,
+    topTimezones: topTimezones.rows,
     topFilters: topFilters.rows,
     topDrugs: topDrugs.rows,
     resultDistribution: resultDistribution.rows
   };
 };
 
-const hashVisitor = (req: Request) => {
+export const getAnalyticsEventsForExport = async (days: number, eventName?: string) => {
+  const boundedDays = Math.min(Math.max(days, 1), 365);
+  const params: Array<string | number> = [boundedDays];
+  const eventFilter = eventName ? 'AND event_name = $2' : '';
+  if (eventName) {
+    params.push(eventName);
+  }
+
+  const result = await query(
+    `
+      SELECT
+        created_at,
+        event_name,
+        path,
+        referrer,
+        session_id,
+        LEFT(COALESCE(visitor_hash, ''), 12) AS visitor_key,
+        payload
+      FROM analytics_events
+      WHERE created_at >= NOW() - ($1::int * INTERVAL '1 day')
+      ${eventFilter}
+      ORDER BY created_at DESC
+      LIMIT 10000
+    `,
+    params
+  );
+
+  const rows = [
+    ['created_at', 'event_name', 'path', 'referrer', 'session_id', 'visitor_key', 'payload'],
+    ...result.rows.map((row) => [
+      row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
+      row.event_name,
+      row.path,
+      row.referrer,
+      row.session_id,
+      row.visitor_key,
+      JSON.stringify(row.payload ?? {})
+    ])
+  ];
+
+  return rows.map((row) => row.map(csvCell).join(',')).join('\n');
+};
+
+const hashVisitor = (event: AnalyticsEventInput, req: Request) => {
   const salt = process.env.ANALYTICS_SALT || 'rheum-biologics-analytics';
+  if (event.visitorId) {
+    return crypto.createHash('sha256').update(`${salt}:visitor:${event.visitorId}`).digest('hex');
+  }
+
   const forwardedFor = req.get('x-forwarded-for')?.split(',')[0]?.trim();
   const ip = forwardedFor || req.ip || '';
   const userAgent = req.get('user-agent') || '';
@@ -165,6 +276,15 @@ const hashVisitor = (req: Request) => {
     .createHash('sha256')
     .update(`${salt}:${ip}:${userAgent}`)
     .digest('hex');
+};
+
+const csvCell = (value: unknown) => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  const text = String(value);
+  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 };
 
 const sanitizePayload = (payload: Record<string, unknown>) => {

@@ -1,14 +1,16 @@
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
 
 import { trackAnalyticsEvent } from './api/analytics';
 import { DarkModeToggle } from './components/DarkModeToggle';
 import { FeedbackDialog } from './components/FeedbackDialog';
 import { FiltersPanel } from './components/filters/FiltersPanel';
+import { DashboardPage } from './features/dashboard/DashboardPage';
 import { SearchResults } from './features/combinations/components/SearchResults';
 import { useAnalyticsPageView } from './hooks/useAnalyticsPageView';
 
-const App = () => {
+const LookupPage = () => {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   useAnalyticsPageView();
 
@@ -64,5 +66,12 @@ const App = () => {
     </Box>
   );
 };
+
+const App = () => (
+  <Routes>
+    <Route path="/dashboard" element={<DashboardPage />} />
+    <Route path="*" element={<LookupPage />} />
+  </Routes>
+);
 
 export default App;
