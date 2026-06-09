@@ -18,6 +18,8 @@ import { getARALink, hasARALink } from '../../../utils/araLinks';
 import type { CombinationQuery } from '../api';
 import { useCombinationSearch } from '../hooks/useCombinationSearch';
 
+type OutboundDestination = 'ara' | 'pbs' | 'patient_support' | 'compassionate_access';
+
 const ResultCard = ({
   drug,
   brand,
@@ -32,6 +34,11 @@ const ResultCard = ({
   maximumQuantity,
   maximumPack,
   repeats,
+  companyOrSponsor,
+  patientSupportProgram,
+  patientSupportUrl,
+  compassionateAccessProgram,
+  compassionateAccessUrl,
   onOutboundClick
 }: {
   drug: string;
@@ -47,7 +54,12 @@ const ResultCard = ({
   maximumQuantity: number | null;
   maximumPack: number | null;
   repeats: number | null;
-  onOutboundClick: (destination: 'ara' | 'pbs') => void;
+  companyOrSponsor: string | null;
+  patientSupportProgram: string | null;
+  patientSupportUrl: string | null;
+  compassionateAccessProgram: string | null;
+  compassionateAccessUrl: string | null;
+  onOutboundClick: (destination: OutboundDestination) => void;
 }) => (
   <Card variant="outlined" sx={{ 
     height: '100%',
@@ -132,6 +144,38 @@ const ResultCard = ({
             Online application: {onlineApplication ? 'Available' : 'Contact Services Australia'}
           </Typography>
         )}
+        {(patientSupportUrl || compassionateAccessUrl) && (
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 0.5, sm: 1 }}>
+            {patientSupportUrl && (
+              <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
+                Patient support:{' '}
+                <Link
+                  href={patientSupportUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  underline="hover"
+                  onClick={() => onOutboundClick('patient_support')}
+                >
+                  {patientSupportProgram ?? companyOrSponsor ?? 'Program link'}
+                </Link>
+              </Typography>
+            )}
+            {compassionateAccessUrl && (
+              <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
+                Access program:{' '}
+                <Link
+                  href={compassionateAccessUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  underline="hover"
+                  onClick={() => onOutboundClick('compassionate_access')}
+                >
+                  {compassionateAccessProgram ?? companyOrSponsor ?? 'Program link'}
+                </Link>
+              </Typography>
+            )}
+          </Stack>
+        )}
       </Stack>
     </CardContent>
   </Card>
@@ -203,7 +247,7 @@ export const SearchResults = () => {
   };
 
   const handleOutboundClick = (
-    destination: 'ara' | 'pbs',
+    destination: OutboundDestination,
     combination: {
       drug: string;
       brand: string;
@@ -279,6 +323,11 @@ export const SearchResults = () => {
               maximumQuantity={combination.maximum_quantity_units}
               maximumPack={combination.maximum_prescribable_pack}
               repeats={combination.number_of_repeats}
+              companyOrSponsor={combination.company_or_sponsor}
+              patientSupportProgram={combination.patient_support_program}
+              patientSupportUrl={combination.patient_support_url}
+              compassionateAccessProgram={combination.compassionate_access_program}
+              compassionateAccessUrl={combination.compassionate_access_url}
               onOutboundClick={(destination) => handleOutboundClick(destination, combination)}
             />
           </Grid>

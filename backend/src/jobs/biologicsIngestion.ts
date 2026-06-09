@@ -1,6 +1,7 @@
 import { Open } from 'unzipper';
 import Papa from 'papaparse';
 
+import { findPatientSupportAccess } from '../data/patientSupportAccess.js';
 import { replaceScheduleData, type NewBiologicsCombination } from '../services/biologicsService.js';
 
 const REQUIRED_FILES = {
@@ -352,6 +353,8 @@ const buildCombinationRows = (tables: RequiredTables, schedule: ScheduleMeta): N
           : !scheduleHtml.includes('HOBART TAS 7001');
 
       for (const brand of item.brands) {
+        const supportAccess = findPatientSupportAccess(brand);
+
         combinations.push({
           pbs_code: pbsCode,
           drug: item.drug,
@@ -369,6 +372,14 @@ const buildCombinationRows = (tables: RequiredTables, schedule: ScheduleMeta): N
           maximum_prescribable_pack: item.maximumPack,
           maximum_quantity_units: item.maximumQuantity,
           number_of_repeats: item.repeats,
+          company_or_sponsor: supportAccess?.company_or_sponsor ?? null,
+          patient_support_program: supportAccess?.patient_support_program ?? null,
+          patient_support_url: supportAccess?.patient_support_url ?? null,
+          patient_support_type: supportAccess?.patient_support_type ?? null,
+          compassionate_access_program: supportAccess?.compassionate_or_managed_access_program ?? null,
+          compassionate_access_url: supportAccess?.compassionate_or_managed_access_url ?? null,
+          compassionate_access_type: supportAccess?.compassionate_access_type ?? null,
+          support_access_notes: supportAccess?.notes ?? null,
           schedule_code: schedule.code,
           schedule_year: schedule.year,
           schedule_month: schedule.month

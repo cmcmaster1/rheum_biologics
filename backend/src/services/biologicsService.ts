@@ -84,6 +84,14 @@ export type BiologicsCombination = {
   maximum_prescribable_pack: number | null;
   maximum_quantity_units: number | null;
   number_of_repeats: number | null;
+  company_or_sponsor: string | null;
+  patient_support_program: string | null;
+  patient_support_url: string | null;
+  patient_support_type: string | null;
+  compassionate_access_program: string | null;
+  compassionate_access_url: string | null;
+  compassionate_access_type: string | null;
+  support_access_notes: string | null;
   schedule_code: string;
   schedule_year: number;
   schedule_month: string;
@@ -105,6 +113,14 @@ export type NewBiologicsCombination = {
   maximum_prescribable_pack: number | null;
   maximum_quantity_units: number | null;
   number_of_repeats: number | null;
+  company_or_sponsor: string | null;
+  patient_support_program: string | null;
+  patient_support_url: string | null;
+  patient_support_type: string | null;
+  compassionate_access_program: string | null;
+  compassionate_access_url: string | null;
+  compassionate_access_type: string | null;
+  support_access_notes: string | null;
   schedule_code: string;
   schedule_year: number;
   schedule_month: string;
@@ -182,6 +198,14 @@ export const searchCombinations = async (
       maximum_prescribable_pack,
       maximum_quantity_units,
       number_of_repeats,
+      company_or_sponsor,
+      patient_support_program,
+      patient_support_url,
+      patient_support_type,
+      compassionate_access_program,
+      compassionate_access_url,
+      compassionate_access_type,
+      support_access_notes,
       schedule_code,
       schedule_year,
       schedule_month,
@@ -234,6 +258,14 @@ export const replaceScheduleData = async (
     'maximum_prescribable_pack',
     'maximum_quantity_units',
     'number_of_repeats',
+    'company_or_sponsor',
+    'patient_support_program',
+    'patient_support_url',
+    'patient_support_type',
+    'compassionate_access_program',
+    'compassionate_access_url',
+    'compassionate_access_type',
+    'support_access_notes',
     'schedule_code',
     'schedule_year',
     'schedule_month'
@@ -263,6 +295,14 @@ export const replaceScheduleData = async (
           row.maximum_prescribable_pack,
           row.maximum_quantity_units,
           row.number_of_repeats,
+          row.company_or_sponsor,
+          row.patient_support_program,
+          row.patient_support_url,
+          row.patient_support_type,
+          row.compassionate_access_program,
+          row.compassionate_access_url,
+          row.compassionate_access_type,
+          row.support_access_notes,
           row.schedule_code,
           row.schedule_year,
           row.schedule_month

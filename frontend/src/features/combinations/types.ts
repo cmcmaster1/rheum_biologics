@@ -13,6 +13,14 @@ export type Combination = {
   maximum_prescribable_pack: number | null;
   maximum_quantity_units: number | null;
   number_of_repeats: number | null;
+  company_or_sponsor: string | null;
+  patient_support_program: string | null;
+  patient_support_url: string | null;
+  patient_support_type: string | null;
+  compassionate_access_program: string | null;
+  compassionate_access_url: string | null;
+  compassionate_access_type: string | null;
+  support_access_notes: string | null;
   schedule_code: string;
   schedule_year: number;
   schedule_month: string;
