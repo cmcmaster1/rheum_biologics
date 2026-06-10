@@ -5,7 +5,7 @@ import { trackAnalyticsEvent } from '../../../api/analytics';
 import { useSearchStore } from '../../../store/searchStore';
 import { getARALink, hasARALink } from '../../../utils/araLinks';
 import { useCombinationSearch } from '../hooks/useCombinationSearch';
-const ResultCard = ({ drug, brand, pbsCode, formulation, indication, treatmentPhase, hospitalType, authorityMethod, streamlinedCode, onlineApplication, maximumQuantity, maximumPack, repeats, companyOrSponsor, patientSupportProgram, patientSupportUrl, compassionateAccessProgram, compassionateAccessUrl, onOutboundClick }) => (_jsx(Card, { variant: "outlined", sx: {
+const ResultCard = ({ drug, brand, pbsCode, formulation, indication, treatmentPhase, hospitalType, authorityMethod, streamlinedCode, onlineApplication, maximumQuantity, maximumPack, repeats, companyOrSponsor, patientSupportProgram, patientSupportUrl, compassionateAccessProgram, compassionateAccessUrl, scheduleMonth, scheduleYear }) => (_jsx(Card, { variant: "outlined", sx: {
         height: '100%',
         width: '100%',
         maxWidth: '100%',
@@ -17,14 +17,65 @@ const ResultCard = ({ drug, brand, pbsCode, formulation, indication, treatmentPh
             },
             overflow: 'hidden',
             wordWrap: 'break-word'
-        }, children: _jsxs(Stack, { spacing: { xs: 0.8, sm: 1.2 }, children: [_jsxs(Stack, { direction: { xs: 'column', sm: 'row' }, justifyContent: "space-between", alignItems: { xs: 'stretch', sm: 'flex-start' }, spacing: { xs: 0.5, sm: 0 }, children: [_jsxs(Box, { children: [_jsxs(Stack, { direction: "row", alignItems: "center", spacing: 1, children: [_jsx(Typography, { variant: "h6", sx: { fontSize: { xs: '1.1rem', sm: '1.25rem' } }, children: drug }), hasARALink(drug) && (_jsx(Link, { href: getARALink(drug), target: "_blank", rel: "noopener noreferrer", underline: "hover", onClick: () => onOutboundClick('ara'), sx: {
+        }, children: _jsxs(Stack, { spacing: { xs: 0.8, sm: 1.2 }, children: [_jsxs(Stack, { direction: { xs: 'column', sm: 'row' }, justifyContent: "space-between", alignItems: { xs: 'stretch', sm: 'flex-start' }, spacing: { xs: 0.5, sm: 0 }, children: [_jsxs(Box, { children: [_jsxs(Stack, { direction: "row", alignItems: "center", spacing: 1, children: [_jsx(Typography, { variant: "h6", sx: { fontSize: { xs: '1.1rem', sm: '1.25rem' } }, children: drug }), hasARALink(drug) && (_jsx(Link, { href: getARALink(drug), target: "_blank", rel: "noopener noreferrer", underline: "hover", sx: {
                                                 fontSize: { xs: '0.75rem', sm: '0.875rem' },
                                                 color: 'primary.main',
                                                 fontWeight: 500
-                                            }, children: "ARA Info" }))] }), _jsx(Typography, { color: "text.secondary", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: brand })] }), _jsx(Typography, { variant: "body2", fontWeight: 600, sx: {
+                                            }, ...analyticsLinkAttributes({
+                                                destination: 'ara',
+                                                targetUrl: getARALink(drug),
+                                                linkText: 'ARA Info',
+                                                drug,
+                                                brand,
+                                                pbsCode,
+                                                indication,
+                                                scheduleMonth,
+                                                scheduleYear
+                                            }), children: "ARA Info" }))] }), _jsx(Typography, { color: "text.secondary", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: brand })] }), _jsx(Typography, { variant: "body2", fontWeight: 600, sx: {
                                 mt: { xs: 1, sm: 0 },
                                 fontSize: { xs: '0.75rem', sm: '0.875rem' }
-                            }, children: _jsxs(Link, { href: `https://www.pbs.gov.au/medicine/item/${pbsCode}`, target: "_blank", rel: "noopener noreferrer", underline: "hover", onClick: () => onOutboundClick('pbs'), children: ["PBS ", pbsCode] }) })] }), _jsx(Typography, { variant: "subtitle2", color: "text.secondary", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: formulation }), _jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Indication: ", indication] }), treatmentPhase && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Treatment phase: ", treatmentPhase] })), hospitalType && _jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Hospital type: ", hospitalType] }), _jsxs(Stack, { direction: { xs: 'column', sm: 'row' }, spacing: { xs: 0.5, sm: 1 }, children: [authorityMethod && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Authority: ", authorityMethod] })), streamlinedCode && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Streamlined: ", streamlinedCode] }))] }), _jsxs(Stack, { direction: { xs: 'column', sm: 'row' }, spacing: { xs: 0.5, sm: 1 }, children: [maximumPackageText(maximumPack, maximumQuantity), repeats !== null && _jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Repeats: ", repeats] })] }), onlineApplication !== null && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Online application: ", onlineApplication ? 'Available' : 'Contact Services Australia'] })), (patientSupportUrl || compassionateAccessUrl) && (_jsxs(Stack, { direction: { xs: 'column', sm: 'row' }, spacing: { xs: 0.5, sm: 1 }, children: [patientSupportUrl && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Patient support:", ' ', _jsx(Link, { href: patientSupportUrl, target: "_blank", rel: "noopener noreferrer", underline: "hover", onClick: () => onOutboundClick('patient_support'), children: patientSupportProgram ?? companyOrSponsor ?? 'Program link' })] })), compassionateAccessUrl && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Access program:", ' ', _jsx(Link, { href: compassionateAccessUrl, target: "_blank", rel: "noopener noreferrer", underline: "hover", onClick: () => onOutboundClick('compassionate_access'), children: compassionateAccessProgram ?? companyOrSponsor ?? 'Program link' })] }))] }))] }) }) }));
+                            }, children: _jsxs(Link, { href: `https://www.pbs.gov.au/medicine/item/${pbsCode}`, target: "_blank", rel: "noopener noreferrer", underline: "hover", ...analyticsLinkAttributes({
+                                    destination: 'pbs',
+                                    targetUrl: `https://www.pbs.gov.au/medicine/item/${pbsCode}`,
+                                    linkText: `PBS ${pbsCode}`,
+                                    drug,
+                                    brand,
+                                    pbsCode,
+                                    indication,
+                                    scheduleMonth,
+                                    scheduleYear
+                                }), children: ["PBS ", pbsCode] }) })] }), _jsx(Typography, { variant: "subtitle2", color: "text.secondary", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: formulation }), _jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Indication: ", indication] }), treatmentPhase && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Treatment phase: ", treatmentPhase] })), hospitalType && _jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Hospital type: ", hospitalType] }), _jsxs(Stack, { direction: { xs: 'column', sm: 'row' }, spacing: { xs: 0.5, sm: 1 }, children: [authorityMethod && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Authority: ", authorityMethod] })), streamlinedCode && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Streamlined: ", streamlinedCode] }))] }), _jsxs(Stack, { direction: { xs: 'column', sm: 'row' }, spacing: { xs: 0.5, sm: 1 }, children: [maximumPackageText(maximumPack, maximumQuantity), repeats !== null && _jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Repeats: ", repeats] })] }), onlineApplication !== null && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Online application: ", onlineApplication ? 'Available' : 'Contact Services Australia'] })), (patientSupportUrl || compassionateAccessUrl) && (_jsxs(Stack, { direction: { xs: 'column', sm: 'row' }, spacing: { xs: 0.5, sm: 1 }, children: [patientSupportUrl && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Patient support:", ' ', _jsx(Link, { href: patientSupportUrl, target: "_blank", rel: "noopener noreferrer", underline: "hover", ...analyticsLinkAttributes({
+                                        destination: 'patient_support',
+                                        targetUrl: patientSupportUrl,
+                                        linkText: patientSupportProgram ?? companyOrSponsor ?? 'Program link',
+                                        drug,
+                                        brand,
+                                        pbsCode,
+                                        indication,
+                                        scheduleMonth,
+                                        scheduleYear
+                                    }), children: patientSupportProgram ?? companyOrSponsor ?? 'Program link' })] })), compassionateAccessUrl && (_jsxs(Typography, { variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' } }, children: ["Access program:", ' ', _jsx(Link, { href: compassionateAccessUrl, target: "_blank", rel: "noopener noreferrer", underline: "hover", ...analyticsLinkAttributes({
+                                        destination: 'compassionate_access',
+                                        targetUrl: compassionateAccessUrl,
+                                        linkText: compassionateAccessProgram ?? companyOrSponsor ?? 'Program link',
+                                        drug,
+                                        brand,
+                                        pbsCode,
+                                        indication,
+                                        scheduleMonth,
+                                        scheduleYear
+                                    }), children: compassionateAccessProgram ?? companyOrSponsor ?? 'Program link' })] }))] }))] }) }) }));
+const analyticsLinkAttributes = ({ destination, targetUrl, linkText, drug, brand, pbsCode, indication, scheduleMonth, scheduleYear }) => ({
+    'data-analytics-destination': destination,
+    'data-analytics-target-url': targetUrl,
+    'data-analytics-link-text': linkText,
+    'data-analytics-drug': drug,
+    'data-analytics-brand': brand,
+    'data-analytics-pbs-code': pbsCode,
+    'data-analytics-indication': indication,
+    'data-analytics-schedule-month': scheduleMonth,
+    'data-analytics-schedule-year': String(scheduleYear)
+});
 const maximumPackageText = (pack, units) => {
     if (pack === null && units === null) {
         return null;
@@ -45,6 +96,34 @@ export const SearchResults = () => {
     const setPage = useSearchStore((state) => state.setPage);
     const lastSearchEventKey = useRef(null);
     const searchAnalyticsPayload = useMemo(() => buildSearchAnalyticsPayload(queryParams), [queryParams]);
+    useEffect(() => {
+        const handleAnalyticsLinkClick = (event) => {
+            const target = event.target;
+            if (!(target instanceof Element)) {
+                return;
+            }
+            const link = target.closest('a[data-analytics-destination]');
+            if (!link) {
+                return;
+            }
+            trackAnalyticsEvent({
+                eventName: 'outbound_link_click',
+                payload: {
+                    destination: link.dataset.analyticsDestination,
+                    targetUrl: link.dataset.analyticsTargetUrl ?? link.href,
+                    linkText: link.dataset.analyticsLinkText ?? link.textContent?.trim(),
+                    drug: link.dataset.analyticsDrug,
+                    brand: link.dataset.analyticsBrand,
+                    pbsCode: link.dataset.analyticsPbsCode,
+                    indication: link.dataset.analyticsIndication,
+                    scheduleMonth: link.dataset.analyticsScheduleMonth,
+                    scheduleYear: Number(link.dataset.analyticsScheduleYear)
+                }
+            });
+        };
+        document.addEventListener('click', handleAnalyticsLinkClick, { capture: true });
+        return () => document.removeEventListener('click', handleAnalyticsLinkClick, { capture: true });
+    }, []);
     useEffect(() => {
         if (!data || isLoading || isError) {
             return;
@@ -78,20 +157,6 @@ export const SearchResults = () => {
         });
         setPage(value);
     };
-    const handleOutboundClick = (destination, combination) => {
-        trackAnalyticsEvent({
-            eventName: 'outbound_link_click',
-            payload: {
-                destination,
-                drug: combination.drug,
-                brand: combination.brand,
-                pbsCode: combination.pbs_code,
-                indication: combination.indication,
-                scheduleMonth: combination.schedule_month,
-                scheduleYear: combination.schedule_year
-            }
-        });
-    };
     if (isLoading) {
         return (_jsxs(Stack, { alignItems: "center", py: 6, spacing: 2, children: [_jsx(CircularProgress, {}), _jsx(Typography, { children: "Loading combinations\u2026" })] }));
     }
@@ -104,7 +169,7 @@ export const SearchResults = () => {
     if (total === 0) {
         return (_jsxs(Stack, { spacing: 2, py: 6, alignItems: "center", children: [_jsx(Typography, { variant: "h6", children: "No results" }), _jsx(Typography, { color: "text.secondary", align: "center", children: "Try adjusting your filters or selecting a different schedule." })] }));
     }
-    return (_jsxs(Stack, { spacing: 3, children: [_jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Showing ", combinations.length, " of ", total, " results \u00B7 Latest schedule ", combinations[0]?.schedule_month, " ", combinations[0]?.schedule_year] }), _jsx(Grid, { container: true, spacing: { xs: 1, sm: 2 }, children: combinations.map((combination) => (_jsx(Grid, { item: true, xs: 12, md: 6, children: _jsx(ResultCard, { drug: combination.drug, brand: combination.brand, pbsCode: combination.pbs_code, formulation: combination.formulation, indication: combination.indication, treatmentPhase: combination.treatment_phase, hospitalType: combination.hospital_type, authorityMethod: combination.authority_method, streamlinedCode: combination.streamlined_code, onlineApplication: combination.online_application, maximumQuantity: combination.maximum_quantity_units, maximumPack: combination.maximum_prescribable_pack, repeats: combination.number_of_repeats, companyOrSponsor: combination.company_or_sponsor, patientSupportProgram: combination.patient_support_program, patientSupportUrl: combination.patient_support_url, compassionateAccessProgram: combination.compassionate_access_program, compassionateAccessUrl: combination.compassionate_access_url, onOutboundClick: (destination) => handleOutboundClick(destination, combination) }) }, combination.id))) }), totalPages > 1 && (_jsx(Stack, { alignItems: "center", children: _jsx(Pagination, { count: totalPages, color: "primary", page: page, onChange: (_event, value) => handlePageChange(value), showFirstButton: true, showLastButton: true }) }))] }));
+    return (_jsxs(Stack, { spacing: 3, children: [_jsxs(Typography, { variant: "body2", color: "text.secondary", children: ["Showing ", combinations.length, " of ", total, " results \u00B7 Latest schedule ", combinations[0]?.schedule_month, " ", combinations[0]?.schedule_year] }), _jsx(Grid, { container: true, spacing: { xs: 1, sm: 2 }, children: combinations.map((combination) => (_jsx(Grid, { item: true, xs: 12, md: 6, children: _jsx(ResultCard, { drug: combination.drug, brand: combination.brand, pbsCode: combination.pbs_code, formulation: combination.formulation, indication: combination.indication, treatmentPhase: combination.treatment_phase, hospitalType: combination.hospital_type, authorityMethod: combination.authority_method, streamlinedCode: combination.streamlined_code, onlineApplication: combination.online_application, maximumQuantity: combination.maximum_quantity_units, maximumPack: combination.maximum_prescribable_pack, repeats: combination.number_of_repeats, companyOrSponsor: combination.company_or_sponsor, patientSupportProgram: combination.patient_support_program, patientSupportUrl: combination.patient_support_url, compassionateAccessProgram: combination.compassionate_access_program, compassionateAccessUrl: combination.compassionate_access_url, scheduleMonth: combination.schedule_month, scheduleYear: combination.schedule_year }) }, combination.id))) }), totalPages > 1 && (_jsx(Stack, { alignItems: "center", children: _jsx(Pagination, { count: totalPages, color: "primary", page: page, onChange: (_event, value) => handlePageChange(value), showFirstButton: true, showLastButton: true }) }))] }));
 };
 const buildSearchAnalyticsPayload = (queryParams) => {
     const filters = {

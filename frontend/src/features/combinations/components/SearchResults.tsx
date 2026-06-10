@@ -39,7 +39,8 @@ const ResultCard = ({
   patientSupportUrl,
   compassionateAccessProgram,
   compassionateAccessUrl,
-  onOutboundClick
+  scheduleMonth,
+  scheduleYear
 }: {
   drug: string;
   brand: string;
@@ -59,7 +60,8 @@ const ResultCard = ({
   patientSupportUrl: string | null;
   compassionateAccessProgram: string | null;
   compassionateAccessUrl: string | null;
-  onOutboundClick: (destination: OutboundDestination) => void;
+  scheduleMonth: string;
+  scheduleYear: number;
 }) => (
   <Card variant="outlined" sx={{ 
     height: '100%',
@@ -91,12 +93,22 @@ const ResultCard = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   underline="hover"
-                  onClick={() => onOutboundClick('ara')}
                   sx={{ 
                     fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     color: 'primary.main',
                     fontWeight: 500
                   }}
+                  {...analyticsLinkAttributes({
+                    destination: 'ara',
+                    targetUrl: getARALink(drug)!,
+                    linkText: 'ARA Info',
+                    drug,
+                    brand,
+                    pbsCode,
+                    indication,
+                    scheduleMonth,
+                    scheduleYear
+                  })}
                 >
                   ARA Info
                 </Link>
@@ -113,7 +125,17 @@ const ResultCard = ({
               target="_blank"
               rel="noopener noreferrer"
               underline="hover"
-              onClick={() => onOutboundClick('pbs')}
+              {...analyticsLinkAttributes({
+                destination: 'pbs',
+                targetUrl: `https://www.pbs.gov.au/medicine/item/${pbsCode}`,
+                linkText: `PBS ${pbsCode}`,
+                drug,
+                brand,
+                pbsCode,
+                indication,
+                scheduleMonth,
+                scheduleYear
+              })}
             >
               PBS {pbsCode}
             </Link>
@@ -154,7 +176,17 @@ const ResultCard = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   underline="hover"
-                  onClick={() => onOutboundClick('patient_support')}
+                  {...analyticsLinkAttributes({
+                    destination: 'patient_support',
+                    targetUrl: patientSupportUrl,
+                    linkText: patientSupportProgram ?? companyOrSponsor ?? 'Program link',
+                    drug,
+                    brand,
+                    pbsCode,
+                    indication,
+                    scheduleMonth,
+                    scheduleYear
+                  })}
                 >
                   {patientSupportProgram ?? companyOrSponsor ?? 'Program link'}
                 </Link>
@@ -168,7 +200,17 @@ const ResultCard = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   underline="hover"
-                  onClick={() => onOutboundClick('compassionate_access')}
+                  {...analyticsLinkAttributes({
+                    destination: 'compassionate_access',
+                    targetUrl: compassionateAccessUrl,
+                    linkText: compassionateAccessProgram ?? companyOrSponsor ?? 'Program link',
+                    drug,
+                    brand,
+                    pbsCode,
+                    indication,
+                    scheduleMonth,
+                    scheduleYear
+                  })}
                 >
                   {compassionateAccessProgram ?? companyOrSponsor ?? 'Program link'}
                 </Link>
@@ -180,6 +222,38 @@ const ResultCard = ({
     </CardContent>
   </Card>
 );
+
+const analyticsLinkAttributes = ({
+  destination,
+  targetUrl,
+  linkText,
+  drug,
+  brand,
+  pbsCode,
+  indication,
+  scheduleMonth,
+  scheduleYear
+}: {
+  destination: OutboundDestination;
+  targetUrl: string;
+  linkText: string;
+  drug: string;
+  brand: string;
+  pbsCode: string;
+  indication: string;
+  scheduleMonth: string;
+  scheduleYear: number;
+}) => ({
+  'data-analytics-destination': destination,
+  'data-analytics-target-url': targetUrl,
+  'data-analytics-link-text': linkText,
+  'data-analytics-drug': drug,
+  'data-analytics-brand': brand,
+  'data-analytics-pbs-code': pbsCode,
+  'data-analytics-indication': indication,
+  'data-analytics-schedule-month': scheduleMonth,
+  'data-analytics-schedule-year': String(scheduleYear)
+});
 
 const maximumPackageText = (pack: number | null, units: number | null) => {
   if (pack === null && units === null) {
@@ -207,6 +281,38 @@ export const SearchResults = () => {
     () => buildSearchAnalyticsPayload(queryParams),
     [queryParams]
   );
+
+  useEffect(() => {
+    const handleAnalyticsLinkClick = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) {
+        return;
+      }
+
+      const link = target.closest<HTMLAnchorElement>('a[data-analytics-destination]');
+      if (!link) {
+        return;
+      }
+
+      trackAnalyticsEvent({
+        eventName: 'outbound_link_click',
+        payload: {
+          destination: link.dataset.analyticsDestination,
+          targetUrl: link.dataset.analyticsTargetUrl ?? link.href,
+          linkText: link.dataset.analyticsLinkText ?? link.textContent?.trim(),
+          drug: link.dataset.analyticsDrug,
+          brand: link.dataset.analyticsBrand,
+          pbsCode: link.dataset.analyticsPbsCode,
+          indication: link.dataset.analyticsIndication,
+          scheduleMonth: link.dataset.analyticsScheduleMonth,
+          scheduleYear: Number(link.dataset.analyticsScheduleYear)
+        }
+      });
+    };
+
+    document.addEventListener('click', handleAnalyticsLinkClick, { capture: true });
+    return () => document.removeEventListener('click', handleAnalyticsLinkClick, { capture: true });
+  }, []);
 
   useEffect(() => {
     if (!data || isLoading || isError) {
@@ -244,31 +350,6 @@ export const SearchResults = () => {
       }
     });
     setPage(value);
-  };
-
-  const handleOutboundClick = (
-    destination: OutboundDestination,
-    combination: {
-      drug: string;
-      brand: string;
-      pbs_code: string;
-      indication: string;
-      schedule_month: string;
-      schedule_year: number;
-    }
-  ) => {
-    trackAnalyticsEvent({
-      eventName: 'outbound_link_click',
-      payload: {
-        destination,
-        drug: combination.drug,
-        brand: combination.brand,
-        pbsCode: combination.pbs_code,
-        indication: combination.indication,
-        scheduleMonth: combination.schedule_month,
-        scheduleYear: combination.schedule_year
-      }
-    });
   };
 
   if (isLoading) {
@@ -328,7 +409,8 @@ export const SearchResults = () => {
               patientSupportUrl={combination.patient_support_url}
               compassionateAccessProgram={combination.compassionate_access_program}
               compassionateAccessUrl={combination.compassionate_access_url}
-              onOutboundClick={(destination) => handleOutboundClick(destination, combination)}
+              scheduleMonth={combination.schedule_month}
+              scheduleYear={combination.schedule_year}
             />
           </Grid>
         ))}
