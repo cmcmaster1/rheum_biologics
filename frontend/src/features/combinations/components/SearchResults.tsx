@@ -167,15 +167,29 @@ const ResultCard = ({
           </Typography>
         )}
         {(patientSupportUrl || compassionateAccessUrl) && (
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 0.5, sm: 1 }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+              gap: { xs: 0.75, sm: 1.5 },
+              pt: 0.25
+            }}
+          >
             {patientSupportUrl && (
-              <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
-                Patient support:{' '}
+              <Typography
+                component="div"
+                variant="body2"
+                sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' }, minWidth: 0 }}
+              >
+                <Box component="span" sx={{ display: 'block', color: 'text.secondary' }}>
+                  Patient support
+                </Box>
                 <Link
                   href={patientSupportUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   underline="hover"
+                  sx={{ overflowWrap: 'anywhere' }}
                   {...analyticsLinkAttributes({
                     destination: 'patient_support',
                     targetUrl: patientSupportUrl,
@@ -193,13 +207,20 @@ const ResultCard = ({
               </Typography>
             )}
             {compassionateAccessUrl && (
-              <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
-                Access program:{' '}
+              <Typography
+                component="div"
+                variant="body2"
+                sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' }, minWidth: 0 }}
+              >
+                <Box component="span" sx={{ display: 'block', color: 'text.secondary' }}>
+                  Access program
+                </Box>
                 <Link
                   href={compassionateAccessUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   underline="hover"
+                  sx={{ overflowWrap: 'anywhere' }}
                   {...analyticsLinkAttributes({
                     destination: 'compassionate_access',
                     targetUrl: compassionateAccessUrl,
@@ -216,7 +237,7 @@ const ResultCard = ({
                 </Link>
               </Typography>
             )}
-          </Stack>
+          </Box>
         )}
       </Stack>
     </CardContent>
