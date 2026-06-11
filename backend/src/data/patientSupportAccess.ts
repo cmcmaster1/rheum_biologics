@@ -146,10 +146,10 @@ export const patientSupportAccess: PatientSupportAccess[] = [
     brand: 'Brenzys',
     generic_name: 'etanercept',
     therapy_class: 'bDMARD',
-    company_or_sponsor: 'Arrotex Biologics / Samsung Bioepis',
-    patient_support_program: 'SupportEd',
-    patient_support_url: 'https://www.supportedpsp.com.au/',
-    patient_support_type: 'Patient support program',
+    company_or_sponsor: 'Organon',
+    patient_support_program: 'Organon Connect',
+    patient_support_url: 'https://org-connect.app.link/register',
+    patient_support_type: 'Patient support app',
     compassionate_access_type: 'No public AU CAP found'
   },
   {
