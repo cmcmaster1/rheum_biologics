@@ -5,12 +5,15 @@ import {
   CardContent,
   CircularProgress,
   Grid,
+  IconButton,
   Link,
   Pagination,
   Stack,
+  Tooltip,
   Typography
 } from '@mui/material';
-import { useEffect, useMemo, useRef } from 'react';
+import { Check, ContentCopy, OpenInNew } from '@mui/icons-material';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { trackAnalyticsEvent } from '../../../api/analytics';
 import { useSearchStore } from '../../../store/searchStore';
@@ -93,7 +96,10 @@ const ResultCard = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   underline="hover"
-                  sx={{ 
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.25,
                     fontSize: { xs: '0.75rem', sm: '0.875rem' },
                     color: 'primary.main',
                     fontWeight: 500
@@ -111,20 +117,28 @@ const ResultCard = ({
                   })}
                 >
                   ARA Info
+                  <OpenInNew sx={{ fontSize: '0.9em' }} />
                 </Link>
               )}
             </Stack>
             <Typography color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>{brand}</Typography>
           </Box>
-          <Typography variant="body2" fontWeight={600} sx={{ 
+          <Stack direction="row" spacing={0.25} alignItems="center" sx={{ 
             mt: { xs: 1, sm: 0 },
-            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+            flexShrink: 0
           }}>
             <Link
               href={`https://www.pbs.gov.au/medicine/item/${pbsCode}`}
               target="_blank"
               rel="noopener noreferrer"
               underline="hover"
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.25,
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                fontWeight: 600
+              }}
               {...analyticsLinkAttributes({
                 destination: 'pbs',
                 targetUrl: `https://www.pbs.gov.au/medicine/item/${pbsCode}`,
@@ -138,8 +152,23 @@ const ResultCard = ({
               })}
             >
               PBS {pbsCode}
+              <OpenInNew sx={{ fontSize: '0.95em' }} />
             </Link>
-          </Typography>
+            <CopyButton
+              label="PBS item code"
+              value={pbsCode}
+              analyticsPayload={{
+                field: 'pbs_code',
+                value: pbsCode,
+                drug,
+                brand,
+                pbsCode,
+                indication,
+                scheduleMonth,
+                scheduleYear
+              }}
+            />
+          </Stack>
         </Stack>
         <Typography variant="subtitle2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
           {formulation}
@@ -154,7 +183,23 @@ const ResultCard = ({
             <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Authority: {authorityMethod}</Typography>
           )}
           {streamlinedCode && (
-            <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Streamlined: {streamlinedCode}</Typography>
+            <Stack direction="row" spacing={0.25} alignItems="center" sx={{ minWidth: 0 }}>
+              <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Streamlined: {streamlinedCode}</Typography>
+              <CopyButton
+                label="streamlined code"
+                value={streamlinedCode}
+                analyticsPayload={{
+                  field: 'streamlined_code',
+                  value: streamlinedCode,
+                  drug,
+                  brand,
+                  pbsCode,
+                  indication,
+                  scheduleMonth,
+                  scheduleYear
+                }}
+              />
+            </Stack>
           )}
         </Stack>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 0.5, sm: 1 }}>
@@ -243,6 +288,63 @@ const ResultCard = ({
     </CardContent>
   </Card>
 );
+
+const CopyButton = ({
+  label,
+  value,
+  analyticsPayload
+}: {
+  label: string;
+  value: string;
+  analyticsPayload: Record<string, unknown>;
+}) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await copyToClipboard(value);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1200);
+
+    trackAnalyticsEvent({
+      eventName: 'code_copied',
+      payload: analyticsPayload
+    });
+  };
+
+  return (
+    <Tooltip title={copied ? 'Copied' : `Copy ${label}`}>
+      <IconButton
+        aria-label={`Copy ${label}`}
+        size="small"
+        onClick={handleCopy}
+        sx={{
+          color: copied ? 'success.main' : 'text.secondary',
+          flexShrink: 0,
+          p: 0.35
+        }}
+      >
+        {copied ? <Check fontSize="inherit" /> : <ContentCopy fontSize="inherit" />}
+      </IconButton>
+    </Tooltip>
+  );
+};
+
+const copyToClipboard = async (value: string) => {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = value;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+};
 
 const analyticsLinkAttributes = ({
   destination,
