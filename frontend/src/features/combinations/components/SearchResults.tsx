@@ -234,7 +234,14 @@ const ResultCard = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   underline="hover"
-                  sx={{ overflowWrap: 'anywhere' }}
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.25,
+                    maxWidth: '100%',
+                    overflowWrap: 'anywhere',
+                    wordBreak: 'break-word'
+                  }}
                   {...analyticsLinkAttributes({
                     destination: 'patient_support',
                     targetUrl: patientSupportUrl,
@@ -247,7 +254,10 @@ const ResultCard = ({
                     scheduleYear
                   })}
                 >
-                  {patientSupportProgram ?? companyOrSponsor ?? 'Program link'}
+                  <Box component="span" sx={{ minWidth: 0 }}>
+                    {patientSupportProgram ?? companyOrSponsor ?? 'Program link'}
+                  </Box>
+                  <OpenInNew sx={{ fontSize: '0.9em', flexShrink: 0 }} />
                 </Link>
               </Typography>
             )}
@@ -265,7 +275,14 @@ const ResultCard = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   underline="hover"
-                  sx={{ overflowWrap: 'anywhere' }}
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.25,
+                    maxWidth: '100%',
+                    overflowWrap: 'anywhere',
+                    wordBreak: 'break-word'
+                  }}
                   {...analyticsLinkAttributes({
                     destination: 'compassionate_access',
                     targetUrl: compassionateAccessUrl,
@@ -278,7 +295,10 @@ const ResultCard = ({
                     scheduleYear
                   })}
                 >
-                  {compassionateAccessProgram ?? companyOrSponsor ?? 'Program link'}
+                  <Box component="span" sx={{ minWidth: 0 }}>
+                    {compassionateAccessProgram ?? companyOrSponsor ?? 'Program link'}
+                  </Box>
+                  <OpenInNew sx={{ fontSize: '0.9em', flexShrink: 0 }} />
                 </Link>
               </Typography>
             )}

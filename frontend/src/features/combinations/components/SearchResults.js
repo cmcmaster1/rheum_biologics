@@ -77,7 +77,14 @@ const ResultCard = ({ drug, brand, pbsCode, formulation, indication, treatmentPh
                         gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
                         gap: { xs: 0.75, sm: 1.5 },
                         pt: 0.25
-                    }, children: [patientSupportUrl && (_jsxs(Typography, { component: "div", variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' }, minWidth: 0 }, children: [_jsx(Box, { component: "span", sx: { display: 'block', color: 'text.secondary' }, children: "Patient support" }), _jsx(Link, { href: patientSupportUrl, target: "_blank", rel: "noopener noreferrer", underline: "hover", sx: { overflowWrap: 'anywhere' }, ...analyticsLinkAttributes({
+                    }, children: [patientSupportUrl && (_jsxs(Typography, { component: "div", variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' }, minWidth: 0 }, children: [_jsx(Box, { component: "span", sx: { display: 'block', color: 'text.secondary' }, children: "Patient support" }), _jsxs(Link, { href: patientSupportUrl, target: "_blank", rel: "noopener noreferrer", underline: "hover", sx: {
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: 0.25,
+                                        maxWidth: '100%',
+                                        overflowWrap: 'anywhere',
+                                        wordBreak: 'break-word'
+                                    }, ...analyticsLinkAttributes({
                                         destination: 'patient_support',
                                         targetUrl: patientSupportUrl,
                                         linkText: patientSupportProgram ?? companyOrSponsor ?? 'Program link',
@@ -87,7 +94,14 @@ const ResultCard = ({ drug, brand, pbsCode, formulation, indication, treatmentPh
                                         indication,
                                         scheduleMonth,
                                         scheduleYear
-                                    }), children: patientSupportProgram ?? companyOrSponsor ?? 'Program link' })] })), compassionateAccessUrl && (_jsxs(Typography, { component: "div", variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' }, minWidth: 0 }, children: [_jsx(Box, { component: "span", sx: { display: 'block', color: 'text.secondary' }, children: "Access program" }), _jsx(Link, { href: compassionateAccessUrl, target: "_blank", rel: "noopener noreferrer", underline: "hover", sx: { overflowWrap: 'anywhere' }, ...analyticsLinkAttributes({
+                                    }), children: [_jsx(Box, { component: "span", sx: { minWidth: 0 }, children: patientSupportProgram ?? companyOrSponsor ?? 'Program link' }), _jsx(OpenInNew, { sx: { fontSize: '0.9em', flexShrink: 0 } })] })] })), compassionateAccessUrl && (_jsxs(Typography, { component: "div", variant: "body2", sx: { fontSize: { xs: '0.8rem', sm: '0.875rem' }, minWidth: 0 }, children: [_jsx(Box, { component: "span", sx: { display: 'block', color: 'text.secondary' }, children: "Access program" }), _jsxs(Link, { href: compassionateAccessUrl, target: "_blank", rel: "noopener noreferrer", underline: "hover", sx: {
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: 0.25,
+                                        maxWidth: '100%',
+                                        overflowWrap: 'anywhere',
+                                        wordBreak: 'break-word'
+                                    }, ...analyticsLinkAttributes({
                                         destination: 'compassionate_access',
                                         targetUrl: compassionateAccessUrl,
                                         linkText: compassionateAccessProgram ?? companyOrSponsor ?? 'Program link',
@@ -97,7 +111,7 @@ const ResultCard = ({ drug, brand, pbsCode, formulation, indication, treatmentPh
                                         indication,
                                         scheduleMonth,
                                         scheduleYear
-                                    }), children: compassionateAccessProgram ?? companyOrSponsor ?? 'Program link' })] }))] }))] }) }) }));
+                                    }), children: [_jsx(Box, { component: "span", sx: { minWidth: 0 }, children: compassionateAccessProgram ?? companyOrSponsor ?? 'Program link' }), _jsx(OpenInNew, { sx: { fontSize: '0.9em', flexShrink: 0 } })] })] }))] }))] }) }) }));
 const CopyButton = ({ label, value, analyticsPayload }) => {
     const [copied, setCopied] = useState(false);
     const handleCopy = async () => {
