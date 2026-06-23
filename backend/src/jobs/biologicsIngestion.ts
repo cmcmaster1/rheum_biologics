@@ -136,16 +136,23 @@ const matchRheumaticIndication = (condition: string | null | undefined): string 
 
 /**
  * Get possible download URLs for a given date.
- * PBS changed their filename format around late 2025:
- * - New format: 2025-12-01-PBS-API-CSV.zip
- * - Old format: 2025-12-01-PBS-API-CSV-files.zip
+ * PBS has moved the public API CSV archive between URL patterns over time:
+ * - Current publications URL: /publication/schedule/YYYY/MM/YYYY-MM-01-PBS-API-CSV-files.zip?variant=3
+ * - Previous downloads URL: /downloads/YYYY/MM/YYYY-MM-01-PBS-API-CSV.zip
+ * - Older downloads URL: /downloads/YYYY/MM/YYYY-MM-01-PBS-API-CSV-files.zip
  */
 const getDownloadUrls = (date: Date): string[] => {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const base = `https://www.pbs.gov.au/downloads/${year}/${month}/${year}-${month}-01-PBS-API-CSV`;
-  // Try new format first, then fall back to old format
-  return [`${base}.zip`, `${base}-files.zip`];
+  const filenameBase = `${year}-${month}-01-PBS-API-CSV`;
+  const publicationsBase = `https://www.pbs.gov.au/publication/schedule/${year}/${month}`;
+  const downloadsBase = `https://www.pbs.gov.au/downloads/${year}/${month}`;
+
+  return [
+    `${publicationsBase}/${filenameBase}-files.zip?variant=3`,
+    `${downloadsBase}/${filenameBase}.zip`,
+    `${downloadsBase}/${filenameBase}-files.zip`
+  ];
 };
 
 const resolveScheduleToDownload = async (
