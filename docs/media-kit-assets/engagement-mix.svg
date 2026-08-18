@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
+  <rect width="1200" height="620" fill="#fbfcfd"/>
+  <rect x="26" y="26" width="1148" height="568" rx="18" fill="#ffffff" stroke="#d9e2e7"/>
+  <text x="58" y="76" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#17324d">Engagement Mix</text>
+  <text x="58" y="108" font-family="Arial, sans-serif" font-size="16" fill="#5d6f7a">High-intent interactions during the latest complete 30-day reporting window</text>
+  <text x="58" y="174" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#17324d">Search result events</text>
+      <rect x="440" y="145" width="595" height="36" rx="18" fill="#edf4f5"/>
+      <rect x="440" y="145" width="595.0" height="36" rx="18" fill="#167d86"/>
+      <text x="1061" y="171" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#17324d">16,212</text>
+<text x="58" y="246" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#17324d">Filter changes</text>
+      <rect x="440" y="217" width="595" height="36" rx="18" fill="#edf4f5"/>
+      <rect x="440" y="217" width="460.0" height="36" rx="18" fill="#167d86"/>
+      <text x="1061" y="243" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#17324d">12,533</text>
+<text x="58" y="318" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#17324d">Page views</text>
+      <rect x="440" y="289" width="595" height="36" rx="18" fill="#edf4f5"/>
+      <rect x="440" y="289" width="74.5" height="36" rx="18" fill="#167d86"/>
+      <text x="1061" y="315" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#17324d">2,030</text>
+<text x="58" y="390" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#17324d">Code copy events</text>
+      <rect x="440" y="361" width="595" height="36" rx="18" fill="#edf4f5"/>
+      <rect x="440" y="361" width="28.1" height="36" rx="18" fill="#167d86"/>
+      <text x="1061" y="387" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#17324d">765</text>
+<text x="58" y="462" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#17324d">Outbound link clicks</text>
+      <rect x="440" y="433" width="595" height="36" rx="18" fill="#edf4f5"/>
+      <rect x="440" y="433" width="6.0" height="36" rx="18" fill="#167d86"/>
+      <text x="1061" y="459" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#17324d">112</text>
+  <text x="58" y="594" font-family="Arial, sans-serif" font-size="12" fill="#7d8b92">Source: Rheum Biologics production analytics, complete 30-day window ending 17 Aug 2026. Today is excluded.</text>
+</svg>

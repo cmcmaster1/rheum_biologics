@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620">
+  <rect width="1100" height="620" fill="#fbfcfd"/>
+  <rect x="26" y="26" width="1048" height="568" rx="18" fill="#ffffff" stroke="#d9e2e7"/>
+  <text x="58" y="76" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#17324d">Audience Reach Trend</text>
+  <text x="58" y="108" font-family="Arial, sans-serif" font-size="16" fill="#5d6f7a">Daily unique visitors and sessions across the latest complete 30-day reporting window</text>
+  <line x1="82" y1="525" x2="1045" y2="525" stroke="#e8eef2"/><text x="68" y="530" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">0</text>
+<line x1="82" y1="449" x2="1045" y2="449" stroke="#e8eef2"/><text x="68" y="454" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">25</text>
+<line x1="82" y1="373" x2="1045" y2="373" stroke="#e8eef2"/><text x="68" y="378" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">50</text>
+<line x1="82" y1="297" x2="1045" y2="297" stroke="#e8eef2"/><text x="68" y="302" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">75</text>
+<line x1="82" y1="221" x2="1045" y2="221" stroke="#e8eef2"/><text x="68" y="226" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">100</text>
+<line x1="82" y1="145" x2="1045" y2="145" stroke="#e8eef2"/><text x="68" y="150" text-anchor="end" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">125</text>
+  <polygon points="82,525 82.0,452.0 115.2,281.8 148.4,227.1 181.6,245.3 214.8,272.7 248.0,385.2 281.2,509.8 314.4,458.1 347.7,172.4 380.9,233.2 414.1,272.7 447.3,202.8 480.5,409.5 513.7,491.6 546.9,442.9 580.1,303.1 613.3,254.4 646.5,199.7 679.7,233.2 712.9,385.2 746.1,500.7 779.3,461.2 812.6,172.4 845.8,193.6 879.0,254.4 912.2,230.1 945.4,290.9 978.6,503.7 1011.8,446.0 1045.0,251.4 1045,525" fill="#ec8f2e" opacity="0.10"/>
+  <polygon points="82,525 82.0,461.2 115.2,339.6 148.4,297.0 181.6,303.1 214.8,324.4 248.0,418.6 281.2,515.9 314.4,461.2 347.7,278.8 380.9,297.0 414.1,309.2 447.3,269.6 480.5,427.7 513.7,500.7 546.9,452.0 580.1,351.7 613.3,351.7 646.5,312.2 679.7,309.2 712.9,406.4 746.1,500.7 779.3,473.3 812.6,297.0 845.8,275.7 879.0,330.4 912.2,300.0 945.4,336.5 978.6,503.7 1011.8,461.2 1045.0,330.4 1045,525" fill="#167d86" opacity="0.12"/>
+  <polyline points="82.0,452.0 115.2,281.8 148.4,227.1 181.6,245.3 214.8,272.7 248.0,385.2 281.2,509.8 314.4,458.1 347.7,172.4 380.9,233.2 414.1,272.7 447.3,202.8 480.5,409.5 513.7,491.6 546.9,442.9 580.1,303.1 613.3,254.4 646.5,199.7 679.7,233.2 712.9,385.2 746.1,500.7 779.3,461.2 812.6,172.4 845.8,193.6 879.0,254.4 912.2,230.1 945.4,290.9 978.6,503.7 1011.8,446.0 1045.0,251.4" fill="none" stroke="#ec8f2e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="82.0,461.2 115.2,339.6 148.4,297.0 181.6,303.1 214.8,324.4 248.0,418.6 281.2,515.9 314.4,461.2 347.7,278.8 380.9,297.0 414.1,309.2 447.3,269.6 480.5,427.7 513.7,500.7 546.9,452.0 580.1,351.7 613.3,351.7 646.5,312.2 679.7,309.2 712.9,406.4 746.1,500.7 779.3,473.3 812.6,297.0 845.8,275.7 879.0,330.4 912.2,300.0 945.4,336.5 978.6,503.7 1011.8,461.2 1045.0,330.4" fill="none" stroke="#167d86" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="82" cy="461.15999999999997" r="4" fill="#167d86"/><circle cx="82" cy="452.04" r="4" fill="#ec8f2e"/>
+<circle cx="115.20689655172413" cy="339.56" r="4" fill="#167d86"/><circle cx="115.20689655172413" cy="281.8" r="4" fill="#ec8f2e"/>
+<circle cx="148.41379310344826" cy="297" r="4" fill="#167d86"/><circle cx="148.41379310344826" cy="227.07999999999998" r="4" fill="#ec8f2e"/>
+<circle cx="181.6206896551724" cy="303.08000000000004" r="4" fill="#167d86"/><circle cx="181.6206896551724" cy="245.32" r="4" fill="#ec8f2e"/>
+<circle cx="214.82758620689654" cy="324.36" r="4" fill="#167d86"/><circle cx="214.82758620689654" cy="272.68" r="4" fill="#ec8f2e"/>
+<circle cx="248.0344827586207" cy="418.6" r="4" fill="#167d86"/><circle cx="248.0344827586207" cy="385.15999999999997" r="4" fill="#ec8f2e"/>
+<circle cx="281.2413793103448" cy="515.88" r="4" fill="#167d86"/><circle cx="281.2413793103448" cy="509.8" r="4" fill="#ec8f2e"/>
+<circle cx="314.44827586206895" cy="461.15999999999997" r="4" fill="#167d86"/><circle cx="314.44827586206895" cy="458.12" r="4" fill="#ec8f2e"/>
+<circle cx="347.6551724137931" cy="278.76" r="4" fill="#167d86"/><circle cx="347.6551724137931" cy="172.36" r="4" fill="#ec8f2e"/>
+<circle cx="380.86206896551727" cy="297" r="4" fill="#167d86"/><circle cx="380.86206896551727" cy="233.16000000000003" r="4" fill="#ec8f2e"/>
+<circle cx="414.0689655172414" cy="309.15999999999997" r="4" fill="#167d86"/><circle cx="414.0689655172414" cy="272.68" r="4" fill="#ec8f2e"/>
+<circle cx="447.2758620689655" cy="269.64" r="4" fill="#167d86"/><circle cx="447.2758620689655" cy="202.76" r="4" fill="#ec8f2e"/>
+<circle cx="480.48275862068965" cy="427.72" r="4" fill="#167d86"/><circle cx="480.48275862068965" cy="409.48" r="4" fill="#ec8f2e"/>
+<circle cx="513.6896551724137" cy="500.68" r="4" fill="#167d86"/><circle cx="513.6896551724137" cy="491.56" r="4" fill="#ec8f2e"/>
+<circle cx="546.8965517241379" cy="452.04" r="4" fill="#167d86"/><circle cx="546.8965517241379" cy="442.92" r="4" fill="#ec8f2e"/>
+<circle cx="580.1034482758621" cy="351.72" r="4" fill="#167d86"/><circle cx="580.1034482758621" cy="303.08000000000004" r="4" fill="#ec8f2e"/>
+<circle cx="613.3103448275862" cy="351.72" r="4" fill="#167d86"/><circle cx="613.3103448275862" cy="254.44" r="4" fill="#ec8f2e"/>
+<circle cx="646.5172413793103" cy="312.2" r="4" fill="#167d86"/><circle cx="646.5172413793103" cy="199.72000000000003" r="4" fill="#ec8f2e"/>
+<circle cx="679.7241379310345" cy="309.15999999999997" r="4" fill="#167d86"/><circle cx="679.7241379310345" cy="233.16000000000003" r="4" fill="#ec8f2e"/>
+<circle cx="712.9310344827586" cy="406.44" r="4" fill="#167d86"/><circle cx="712.9310344827586" cy="385.15999999999997" r="4" fill="#ec8f2e"/>
+<circle cx="746.1379310344828" cy="500.68" r="4" fill="#167d86"/><circle cx="746.1379310344828" cy="500.68" r="4" fill="#ec8f2e"/>
+<circle cx="779.3448275862069" cy="473.32" r="4" fill="#167d86"/><circle cx="779.3448275862069" cy="461.15999999999997" r="4" fill="#ec8f2e"/>
+<circle cx="812.551724137931" cy="297" r="4" fill="#167d86"/><circle cx="812.551724137931" cy="172.36" r="4" fill="#ec8f2e"/>
+<circle cx="845.7586206896551" cy="275.72" r="4" fill="#167d86"/><circle cx="845.7586206896551" cy="193.64" r="4" fill="#ec8f2e"/>
+<circle cx="878.9655172413793" cy="330.44" r="4" fill="#167d86"/><circle cx="878.9655172413793" cy="254.44" r="4" fill="#ec8f2e"/>
+<circle cx="912.1724137931035" cy="300.03999999999996" r="4" fill="#167d86"/><circle cx="912.1724137931035" cy="230.12" r="4" fill="#ec8f2e"/>
+<circle cx="945.3793103448276" cy="336.52" r="4" fill="#167d86"/><circle cx="945.3793103448276" cy="290.91999999999996" r="4" fill="#ec8f2e"/>
+<circle cx="978.5862068965517" cy="503.72" r="4" fill="#167d86"/><circle cx="978.5862068965517" cy="503.72" r="4" fill="#ec8f2e"/>
+<circle cx="1011.7931034482758" cy="461.15999999999997" r="4" fill="#167d86"/><circle cx="1011.7931034482758" cy="445.96" r="4" fill="#ec8f2e"/>
+<circle cx="1045" cy="330.44" r="4" fill="#167d86"/><circle cx="1045" cy="251.39999999999998" r="4" fill="#ec8f2e"/>
+  <line x1="82" y1="525" x2="1045" y2="525" stroke="#cdd8de"/>
+  <text x="82" y="565" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">07/19</text>
+<text x="314.44827586206895" y="565" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">07/26</text>
+<text x="580.1034482758621" y="565" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">08/03</text>
+<text x="845.7586206896551" y="565" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">08/11</text>
+<text x="1045" y="565" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#6d7f88">08/17</text>
+  <rect x="770" y="64" width="250" height="58" rx="12" fill="#f5fafb" stroke="#d9e7e9"/>
+  <circle cx="800" cy="87" r="6" fill="#167d86"/><text x="816" y="92" font-family="Arial, sans-serif" font-size="15" fill="#17324d">Daily unique visitors</text>
+  <circle cx="800" cy="111" r="6" fill="#ec8f2e"/><text x="816" y="116" font-family="Arial, sans-serif" font-size="15" fill="#17324d">Daily sessions</text>
+  <text x="82" y="594" font-family="Arial, sans-serif" font-size="12" fill="#7d8b92">Source: Rheum Biologics production analytics, complete 30-day window ending 17 Aug 2026. Today is excluded.</text>
+</svg>
