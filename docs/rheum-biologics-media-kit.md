@@ -45,7 +45,9 @@ Visitor counts represent anonymous browser/device identifiers and are bot-filter
 
 The current PBS dataset includes August 2026 PBS biologics schedule data with 2,061 rows.
 
-![Audience reach trend](media-kit-assets/audience-reach-trend.png){ width=92% }
+![Weekly activity trend](media-kit-assets/audience-reach-trend.png){ width=92% }
+
+The weekly activity trend covers 15 complete weeks from 4 May to 16 August 2026. The fitted trend line for weekly unique visitors is positive at approximately +4.3 unique visitors per week. The current partial week is excluded.
 
 ## Engagement Signals
 
